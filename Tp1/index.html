@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TP1 - Visualización de datos personales</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    h1 { margin-bottom: 0; }
+    h2 { margin-top: 50px; }
+    .grafico { margin-bottom: 40px; }
+    hr { margin: 50px 0; border: 0; border-top: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <h1>Mi año en Spotify</h1>
+  <p>Trabajo Práctico 1 - Visualización de datos personales</p>
+
+  <hr>
+
+  <h2>¿A qué hora del día escucho más música?</h2>
+  <div class="grafico">
+    <div class='tableauPlaceholder' id='viz1788103778561' style='position: relative'><noscript><a href='#'><img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mi&#47;Minutosescuchadosheatmap&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='Minutosescuchadosheatmap&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mi&#47;Minutosescuchadosheatmap&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>
+    <script type='text/javascript'>
+      var divElement = document.getElementById('viz1788103778561');
+      var vizElement = divElement.getElementsByTagName('object')[0];
+      vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';
+      var scriptElement = document.createElement('script');
+      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+      vizElement.parentNode.insertBefore(scriptElement, vizElement);
+    </script>
+  </div>
+
+  <hr>
+
+  <h2>¿Qué artistas fueron ganando y perdiendo lugar a lo largo del tiempo?</h2>
+  <div class="grafico">
+    <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/30099764"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/30099764/thumbnail" width="100%" alt="bar-chart-race visualization" /></noscript></div>
+  </div>
+
+</body>
+</html>
