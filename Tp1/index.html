@@ -3,62 +3,96 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TP1 - Visualización de datos personales</title>
+  <title>Mi música en datos — TP1</title>
+  <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
   <style>
-    body {
-      font-family: Helvetica, Arial, sans-serif;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-      line-height: 1.5;
+    :root {
+      --fondo: #f8f7f3;
+      --texto: #202a25;
+      --secundario: #657168;
+      --borde: #d9ded7;
+      --verde: #28764a;
     }
-    h1 { margin-bottom: 0; }
-    h2 { margin-top: 50px; }
-    .grafico { margin-bottom: 40px; }
-    .grafico object { width: 100%; height: 500px; }
-    hr { margin: 50px 0; border: 0; border-top: 1px solid #ccc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fondo); color: var(--texto); font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
+    .contenedor { max-width: 1220px; margin: 0 auto; padding: 0 30px; }
+    header { background: #172a20; color: #f7f8f2; }
+    .barra { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; border-bottom: 1px solid #496050; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .barra span:last-child { color: #aed3b4; }
+    .portada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 360px); gap: 48px; align-items: end; padding: 64px 0 72px; }
+    h1 { max-width: 710px; margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(45px, 5vw, 68px); font-weight: 400; line-height: 1.06; letter-spacing: -.04em; }
+    .intro { margin: 0 0 7px; padding-left: 20px; border-left: 3px solid #7ec991; color: #d5dfd5; font-size: 16px; }
+    main { padding-top: 18px; padding-bottom: 70px; }
+    section { padding: 54px 0 62px; border-bottom: 1px solid var(--borde); }
+    section:last-child { border-bottom: 0; }
+    .seccion-encabezado { display: grid; grid-template-columns: 185px minmax(0, 1fr); gap: 28px; align-items: start; margin-bottom: 26px; }
+    .detalle { padding-top: 5px; color: var(--verde); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .detalle span { display: block; margin-bottom: 12px; color: var(--secundario); font-size: 20px; font-weight: 400; letter-spacing: 0; }
+    h2 { max-width: 790px; margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 3vw, 36px); font-weight: 400; line-height: 1.2; letter-spacing: -.025em; }
+    .grafico { overflow: hidden; border: 1px solid var(--borde); background: #fff; padding: 18px; }
+    .grafico object { display: block; width: 100%; aspect-ratio: 9 / 5; }
+    .grafico img { display: block; width: 100%; height: auto; }
+    .grafico-tableau { padding: 6px; }
+    .grafico-tableau tableau-viz { display: block; width: 100%; height: 390px; }
+    .enlace { display: inline-block; margin-top: 12px; color: var(--verde); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .enlace:hover { text-decoration: underline; }
+    @media (max-width: 700px) {
+      .contenedor { padding: 0 18px; }
+      .barra { padding: 18px 0; }
+      .portada { display: block; padding: 48px 0 52px; }
+      .intro { margin: 26px 0 0; }
+      section { padding: 38px 0 44px; }
+      .seccion-encabezado { display: block; margin-bottom: 20px; }
+      .detalle { margin-bottom: 14px; }
+      .detalle span { display: inline; margin-right: 10px; font-size: 14px; }
+      .grafico { padding: 8px; }
+      .grafico-tableau { padding: 0; }
+    }
   </style>
 </head>
 <body>
-
-  <h1>Mi año en Spotify</h1>
-  <p>Trabajo Práctico 1 - Visualización de datos personales</p>
-
-  <hr>
-
-  <h2>¿Qué artistas fueron ganando y perdiendo lugar a lo largo del tiempo?</h2>
-  <div class="grafico">
-    <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/30099764"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/30099764/thumbnail" width="100%" alt="bar-chart-race visualization" /></noscript></div>
-  </div>
-
-  <hr>
-
-  <h2>¿Desde qué dispositivos escuché Spotify a lo largo de los años?</h2>
-  <div class="grafico">
-    <object type="image/svg+xml" data="rawgraphs-dispositivos.svg"></object>
-  </div>
-
-  <hr>
-
-  <h2>¿Escucho cada vez más o menos música?</h2>
-  <div class="grafico">
-    <div style="min-height:428px" id="datawrapper-vis-uU1Vb"><script type="text/javascript" defer src="https://datawrapper.dwcdn.net/uU1Vb/embed.js" charset="utf-8" data-target="#datawrapper-vis-uU1Vb"></script><noscript><img src="https://datawrapper.dwcdn.net/uU1Vb/full.png" alt="Minutos escuchados a través de los años (Line chart)" /></noscript></div>
-  </div>
-
-  <hr>
-
-  <h2>¿A qué hora del día escucho más música?</h2>
-  <div class="grafico">
-    <div class='tableauPlaceholder' id='viz1788103778561' style='position: relative'><noscript><a href='#'><img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mi&#47;Minutosescuchadosheatmap&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='Minutosescuchadosheatmap&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mi&#47;Minutosescuchadosheatmap&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>
-    <script type='text/javascript'>
-      var divElement = document.getElementById('viz1788103778561');
-      var vizElement = divElement.getElementsByTagName('object')[0];
-      vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';
-      var scriptElement = document.createElement('script');
-      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
-      vizElement.parentNode.insertBefore(scriptElement, vizElement);
-    </script>
-  </div>
-
+  <header>
+    <div class="contenedor">
+      <div class="barra"><span>Visualización de datos personales</span><span>TP 01 / Spotify</span></div>
+      <div class="portada">
+        <h1>Mi música en datos</h1>
+        <p class="intro">Un recorrido por mis hábitos de escucha: artistas, dispositivos y momentos del día, vistos desde cuatro formas distintas de visualizar datos.</p>
+      </div>
+    </div>
+  </header>
+  <main class="contenedor">
+    <section>
+      <div class="seccion-encabezado"><div class="detalle"><span>01</span>Flourish</div><h2>¿Qué artistas fueron ganando y perdiendo lugar a lo largo del tiempo?</h2></div>
+      <div class="grafico">
+        <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/30099764"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/30099764/thumbnail" width="100%" alt="Evolución de los artistas más escuchados"></noscript></div>
+      </div>
+    </section>
+    <section>
+      <div class="seccion-encabezado"><div class="detalle"><span>02</span>RAWGraphs</div><h2>¿Desde qué dispositivos escuché Spotify a lo largo de los años?</h2></div>
+      <div class="grafico">
+        <object type="image/svg+xml" data="rawgraphs-dispositivos.svg" aria-label="Dispositivos usados para escuchar Spotify a lo largo de los años"></object>
+      </div>
+    </section>
+    <section>
+      <div class="seccion-encabezado"><div class="detalle"><span>03</span>Datawrapper</div><h2>¿Escucho cada vez más o menos música?</h2></div>
+      <div class="grafico">
+        <div style="min-height:428px" id="datawrapper-vis-uU1Vb"><script defer src="https://datawrapper.dwcdn.net/uU1Vb/embed.js" charset="utf-8" data-target="#datawrapper-vis-uU1Vb"></script><noscript><img src="https://datawrapper.dwcdn.net/uU1Vb/full.png" alt="Minutos escuchados a través de los años"></noscript></div>
+      </div>
+    </section>
+    <section>
+      <div class="seccion-encabezado"><div class="detalle"><span>04</span>Tableau</div><h2>¿A qué hora del día escucho más música?</h2></div>
+      <div class="grafico grafico-tableau">
+        <tableau-viz id="tableau-horas" src="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1" width="100%" height="390px" toolbar="hidden" hide-tabs></tableau-viz>
+        <noscript><img src="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1.png?:showVizHome=no" alt="Mapa de calor de minutos escuchados según el día y la hora"></noscript>
+      </div>
+      <a class="enlace" href="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1?:showVizHome=no" target="_blank" rel="noopener noreferrer">Abrir en Tableau ↗</a>
+    </section>
+  </main>
+  <script type="module">
+    const viz = document.getElementById('tableau-horas');
+    customElements.whenDefined('tableau-viz').then(() => {
+      window.addEventListener('resize', () => viz.resize());
+    });
+  </script>
 </body>
 </html>
