@@ -34,6 +34,13 @@
     .grafico img { display: block; width: 100%; height: auto; }
     .grafico-tableau { padding: 6px; }
     .grafico-tableau tableau-viz { display: block; width: 100%; height: 390px; }
+    .lectura-tableau { width: fit-content; max-width: 100%; margin: 12px 6px 6px auto; padding: 10px 12px; border: 1px solid #bcbcbc; background: #fff; color: #333; box-shadow: 0 2px 5px #0002; font: 12px/1.6 Arial, Helvetica, sans-serif; }
+    .lectura-tableau dl { display: grid; grid-template-columns: auto auto; gap: 3px 12px; margin: 0; }
+    .lectura-tableau dt { color: #777; }
+    .lectura-tableau dd { margin: 0; font-weight: 600; }
+    @media (hover: hover) {
+      tableau-viz:hover ~ .lectura-tableau { opacity: 0; pointer-events: none; }
+    }
     .enlace { display: inline-block; margin-top: 12px; color: var(--verde); font-size: 13px; font-weight: 700; text-decoration: none; }
     .enlace:hover { text-decoration: underline; }
     @media (max-width: 700px) {
@@ -84,6 +91,13 @@
       <div class="grafico grafico-tableau">
         <tableau-viz id="tableau-horas" src="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1" width="100%" height="390px" toolbar="hidden" hide-tabs></tableau-viz>
         <noscript><img src="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1.png?:showVizHome=no" alt="Mapa de calor de minutos escuchados según el día y la hora"></noscript>
+        <aside class="lectura-tableau" aria-label="Lectura del mapa de calor">
+          <dl>
+            <dt>Hora con más minutos:</dt><dd>18 a 19 h</dd>
+            <dt>Día con más minutos:</dt><dd>Martes</dd>
+            <dt>Mayor pico por día y hora:</dt><dd>Viernes, de 11 a 12 h</dd>
+          </dl>
+        </aside>
       </div>
       <a class="enlace" href="https://public.tableau.com/views/Minutosescuchadosheatmap/Sheet1?:showVizHome=no" target="_blank" rel="noopener noreferrer">Abrir en Tableau ↗</a>
     </section>
