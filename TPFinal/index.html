@@ -156,6 +156,10 @@
     .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
     .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
 
+    .resumen { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 6px 0 0; padding: 0; list-style: none; color: var(--texto-2); font-size: 14px; }
+    .resumen li { display: flex; gap: 8px; align-items: baseline; }
+    .resumen i { flex: none; width: 14px; height: 0; border-top: 2px solid; transform: translateY(-4px); }
+    .resumen b { color: var(--texto); font-weight: 600; }
     .lista { margin: 0 0 1.1em; padding-left: 1.2em; }
     .lista li { margin-bottom: .3em; }
     code { font: 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--texto-2); }
@@ -272,15 +276,18 @@
       <div class="tarjeta">
         <p class="grafico-titulo">El camino de cada país, de 1990 a 2024</p>
         <p class="grafico-sub">Cada punto es un año. Hacia la derecha, el país se enriquece; hacia arriba, vive más. Elegí hasta tres países para comparar.</p>
+        <div class="pasos" id="atajos" aria-label="Comparaciones sugeridas"></div>
         <div class="controles" id="selectores"></div>
         <div class="leyenda" id="leyenda-trayectorias"></div>
         <div class="lienzo" id="trayectorias"><div class="tooltip" role="status"></div></div>
+        <ul class="resumen" id="resumen-trayectorias"></ul>
       </div>
       <figcaption>Esperanza de vida al nacer y PIB per cápita PPA (dólares internacionales de 2021), 1990–2024. Eje horizontal logarítmico. En gris, todos los países en 2024 y la línea de esperanza de vida esperada según el ingreso. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
       <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. El pozo que se ve en casi todas las trayectorias en 2020 y 2021 es la pandemia de COVID-19, de la que la mayoría de los países ya se recuperó.</p>
+      <p>Con los botones de arriba del gráfico se pueden explorar otras historias. <strong>Polonia</strong> y <strong>Rusia</strong> tienen hoy un ingreso por habitante parecido, pero los polacos viven cinco años más. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares por persona y ganó diez años de vida. <strong>Gabón</strong>, en cambio, es más pobre que en 1990.</p>
       <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
 
       <h2>Lo que dicen (y lo que no) estos datos</h2>
@@ -702,13 +709,26 @@
       const opciones = paises.filter(d => porPais.has(d.iso3)).sort((a, b) => d3.ascending(a.pais, b.pais));
       const SERIES = ["--serie-1", "--serie-2", "--serie-3"];
       const elegidos = ["USA", "CRI", "CHL"];
+      const ATAJOS = [
+        { nombre: "EE. UU., Costa Rica y Chile", paises: ["USA", "CRI", "CHL"] },
+        { nombre: "Argentina y vecinos", paises: ["ARG", "URY", "BRA"] },
+        { nombre: "China e India", paises: ["CHN", "IND", ""] },
+        { nombre: "Rusia, Polonia y Ucrania", paises: ["RUS", "POL", "UKR"] },
+        { nombre: "Petróleo", paises: ["NGA", "GNQ", "GAB"] },
+      ];
+      const atajos = d3.select("#atajos").selectAll("button").data(ATAJOS).join("button")
+        .attr("type", "button").text(a => a.nombre)
+        .on("click", (ev, a) => {
+          a.paises.forEach((iso3, i) => { elegidos[i] = iso3; });
+          selects.property("value", (d, i) => elegidos[i]);
+          dibujar();
+        });
 
       const selects = d3.select("#selectores").selectAll("label").data(elegidos).join("label")
         .text((d, i) => `País ${i + 1}`)
         .append("select")
-        .on("change", function (ev, d) {
-          const i = selects.nodes().indexOf(this);
-          elegidos[i] = this.value;
+        .on("change", function () {
+          elegidos[selects.nodes().indexOf(this)] = this.value;
           dibujar();
         });
       selects.selectAll("option").data(i => [{ iso3: "", pais: "—" }, ...opciones]).join("option")
@@ -717,6 +737,21 @@
 
       function dibujar() {
         const activos = elegidos.map((iso3, i) => ({ iso3, color: `var(${SERIES[i]})` })).filter(d => d.iso3);
+        atajos.attr("aria-pressed", a => a.paises.every((iso3, i) => iso3 === elegidos[i]));
+
+        // Resumen de cada recorrido: cuánto cambió el ingreso y cuántos años de vida se ganaron
+        d3.select("#resumen-trayectorias").selectAll("li").data(activos, d => d.iso3).join("li")
+          .call(li => li.selectAll("*").remove())
+          .each(function (a) {
+            const serie = porPais.get(a.iso3).filter(d => d.pib && d.vida);
+            const ini = serie[0], fin = serie[serie.length - 1];
+            const li = d3.select(this);
+            li.append("i").style("border-color", a.color);
+            li.append("span").call(sp => {
+              sp.append("b").text(nombre.get(a.iso3));
+              sp.append("span").text(` ${ini.anio}–${fin.anio}: ingreso ×${fmt.coma((fin.pib / ini.pib).toFixed(1))}, ${fmt.signo(fin.vida - ini.vida)} años de vida`);
+            });
+          });
         d3.select("#leyenda-trayectorias").selectAll("span").data(activos, d => d.iso3).join("span")
           .call(s => s.selectAll("*").remove())
           .call(s => s.append("i").attr("class", "trazo").style("border-color", d => d.color))
