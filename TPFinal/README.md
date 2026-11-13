@@ -2,6 +2,8 @@
 
 Trabajo práctico final de Visualización de la Información sobre datos de [World Bank Data360](https://data360.worldbank.org/en/api).
 
+**Integrantes:** Javier Peral Belmont · Pilar Frutos
+
 **Nota publicada:** https://za0sec.github.io/infovis/TPFinal/
 
 El ingreso por habitante explica alrededor del 74 % de las diferencias de esperanza de vida entre países. La nota se ocupa del resto: qué países viven más (o menos) de lo que predice su ingreso.
