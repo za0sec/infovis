@@ -119,6 +119,14 @@
     select, input[type="search"] { min-height: 34px; padding: 4px 10px; border: 1px solid var(--eje); border-radius: 6px; background: var(--superficie); color: var(--texto); font: inherit; }
     input[type="search"] { width: 200px; }
 
+    .pasos { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+    .pasos button { min-height: 34px; padding: 5px 12px; border: 1px solid var(--eje); border-radius: 999px; background: var(--superficie); color: var(--texto-2); font: inherit; font-size: 14px; cursor: pointer; }
+    .pasos button:hover { border-color: var(--texto-3); color: var(--texto); }
+    .pasos button[aria-pressed="true"] { border-color: var(--texto); background: var(--texto); color: var(--superficie); }
+    .pasos button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+    .paso-texto { min-height: 3.1em; margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--acento); background: var(--pagina); color: var(--texto); font-size: 15px; line-height: 1.5; }
+    .paso-texto:empty { display: none; }
+    .anotacion { fill: var(--texto); font-size: 13px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; }
     .leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 6px; color: var(--texto-2); font-size: 13px; }
     .leyenda span { display: inline-flex; gap: 6px; align-items: center; }
     .leyenda i { width: 10px; height: 10px; border-radius: 50%; }
@@ -201,6 +209,8 @@
       <div class="tarjeta">
         <p class="grafico-titulo">Más ingreso, más años de vida… casi siempre</p>
         <p class="grafico-sub">Cada círculo es un país, con tamaño proporcional a su población. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
+        <div class="pasos" id="pasos" aria-label="Recorrido guiado por el gráfico"></div>
+        <p class="paso-texto" id="paso-texto" aria-live="polite"></p>
         <div class="controles">
           <label>Buscar un país <input type="search" id="buscar" list="lista-paises" placeholder="Ej.: Argentina" autocomplete="off"></label>
           <datalist id="lista-paises"></datalist>
@@ -383,12 +393,57 @@
       leyenda.append("span").call(s => s.append("i").attr("class", "linea"))
         .call(s => s.append("span").text("Esperada según el ingreso"));
 
+      const porIso = new Map(paises.map(d => [d.iso3, d]));
+      const usa = porIso.get("USA"), cri = porIso.get("CRI");
+      const PASOS = [
+        {
+          boton: "1. La regla",
+          texto: `Casi todos los países se ubican cerca de la línea. Cada vez que el ingreso por habitante se duplica, la esperanza de vida sube en promedio ${fmt.coma((modelo.b * Math.LN2).toFixed(1))} años.`,
+          activo: () => true,
+        },
+        {
+          boton: "2. Los que viven más",
+          texto: "En azul, los países que viven al menos 3 años más de lo que predice su ingreso. Los hay en todas las regiones: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
+          activo: d => d.brecha >= 3,
+          etiquetas: { JPN: "der", CRI: "der", CHL: "arriba", LKA: "izq", BGD: "izq", ECU: "abajo", JOR: "izq" },
+          movil: { JPN: "izq", CRI: "izq", LKA: "izq" },
+        },
+        {
+          boton: "3. Los que viven menos",
+          texto: "En rojo, los que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
+          activo: d => d.brecha <= -2.95,
+          etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
+          movil: { NGA: "der", RUS: "izq", USA: "abajo" },
+        },
+        {
+          boton: "4. Estados Unidos y Costa Rica",
+          texto: `Estados Unidos tiene ${fmt.coma((usa.pib / cri.pib).toFixed(1))} veces el ingreso por habitante de Costa Rica y gasta ${fmt.coma((usa.gasto_salud / cri.gasto_salud).toFixed(0))} veces más en salud por persona. Aun así, un costarricense vive ${fmt.coma((cri.vida - usa.vida).toFixed(1))} años más.`,
+          activo: d => d.iso3 === "USA" || d.iso3 === "CRI",
+          etiquetas: { USA: "der", CRI: "izq" },
+          movil: { USA: "abajo", CRI: "izq" },
+          comparar: [cri, usa],
+        },
+      ];
+      let paso = 0;
+      const textoPaso = document.getElementById("paso-texto");
+      const botones = d3.select("#pasos").selectAll("button").data(PASOS).join("button")
+        .attr("type", "button").text(p => p.boton)
+        .on("click", (ev, p) => { irAPaso(PASOS.indexOf(p)); });
+      function irAPaso(i) {
+        paso = i;
+        botones.attr("aria-pressed", (p, j) => j === paso);
+        textoPaso.textContent = paso === null ? "" : PASOS[paso].texto;
+        if (paso !== null) { seleccion = null; buscar.value = ""; region.value = ""; tip.ocultar(); }
+        dibujar();
+      }
+
       let seleccion = null;
 
       function dibujar() {
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
+        const actual = paso === null ? null : PASOS[paso];
         const m = { top: 12, right: 14, bottom: 46, left: 44 };
 
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
@@ -419,10 +474,12 @@
 
         const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
         svg.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
-          .attr("fill", "none").attr("stroke", "var(--recta)").attr("stroke-width", 1.5).attr("opacity", .7);
+          .attr("fill", "none").attr("stroke", "var(--recta)")
+          .attr("stroke-width", paso === 0 ? 2.5 : 1.5).attr("opacity", paso === 0 ? 1 : .7);
 
         const filtro = region.value;
-        const activo = d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
+        const activo = actual ? actual.activo
+          : d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
 
         const puntos = svg.append("g").selectAll("circle").data(paises).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", d => Math.max(3.5, r(d.poblacion)))
@@ -430,11 +487,13 @@
           .attr("fill-opacity", d => activo(d) ? .88 : .12)
           .attr("stroke", "var(--superficie)").attr("stroke-width", 1.5);
 
+        const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
+          : actual?.etiquetas ? paises.filter(d => d.iso3 in posiciones)
           : paises.filter(d => (filtro ? d.region === filtro && Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
               .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
         const lado = d => {
-          const preferido = (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS)[d.iso3] || "der";
+          const preferido = posiciones[d.iso3] || "der";
           return preferido === "der" && x(d.pib) > ancho - m.right - 110 ? "izq" : preferido;
         };
         const radio = d => Math.max(3.5, r(d.poblacion));
@@ -444,6 +503,17 @@
           .attr("y", d => y(d.vida) + (({ arriba: -radio(d) - 6, abajo: radio(d) + 14 })[lado(d)] ?? 4))
           .attr("text-anchor", d => ({ der: "start", izq: "end" })[lado(d)] ?? "middle")
           .text(d => d.pais);
+
+        if (actual?.comparar) {
+          // Línea que une a los dos países comparados, con la diferencia de ingreso y de años de vida
+          const [a, b] = actual.comparar;
+          const g = svg.append("g");
+          g.append("line").attr("x1", x(a.pib)).attr("y1", y(a.vida)).attr("x2", x(b.pib)).attr("y2", y(b.vida))
+            .attr("stroke", "var(--texto)").attr("stroke-width", 1.5);
+          g.append("text").attr("class", "anotacion").attr("text-anchor", "middle")
+            .attr("x", (x(a.pib) + x(b.pib)) / 2).attr("y", Math.min(y(a.vida), y(b.vida)) - 14)
+            .text(`${fmt.coma((b.pib / a.pib).toFixed(1))}× ingreso · ${fmt.signo(b.vida - a.vida)} años`);
+        }
 
         const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("opacity", 0);
 
@@ -473,16 +543,18 @@
         if (seleccion) mostrar(seleccion);
       }
 
+      // Buscar o filtrar saca al lector del recorrido guiado y lo deja explorar libremente
+      const salirDelRecorrido = () => { paso = null; botones.attr("aria-pressed", false); textoPaso.textContent = ""; };
       buscar.addEventListener("input", () => {
         const texto = buscar.value.trim().toLowerCase();
         seleccion = paises.find(d => d.pais.toLowerCase() === texto) || null;
-        if (seleccion) region.value = "";
+        if (seleccion) { region.value = ""; salirDelRecorrido(); }
         if (!texto || seleccion) dibujar();
         if (!seleccion) tip.ocultar();
       });
-      region.addEventListener("change", () => { seleccion = null; buscar.value = ""; tip.ocultar(); dibujar(); });
+      region.addEventListener("change", () => { seleccion = null; buscar.value = ""; tip.ocultar(); salirDelRecorrido(); dibujar(); });
 
-      dibujar();
+      irAPaso(0);
       redibujarAlCambiarAncho(contenedor, dibujar);
     }
     function ranking(paises) {
