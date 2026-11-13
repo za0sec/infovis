@@ -151,7 +151,8 @@
 
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
     .nombre-fila { fill: var(--texto); font-size: 13px; }
-    .nombre-fila.argentina { font-weight: 600; }
+    .nombre-fila.argentina { font-weight: 700; }
+    .fila-argentina path { fill: var(--neutro); }
     .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
     .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
 
@@ -259,7 +260,8 @@
     <div class="columna">
       <p>Arriba del ranking conviven realidades muy distintas. <strong>Japón</strong> es el país rico que más se despega: vive casi cinco años más de lo que predice su ingreso, que ya es alto. Lo acompañan países de ingreso medio como <strong>Sri Lanka</strong>, <strong>Marruecos</strong> o <strong>Jordania</strong>, y varios latinoamericanos: <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más.</p>
       <p>Abajo, el patrón es más uniforme. Casi todo el fondo de la tabla es África subsahariana, donde se combinan dos historias: países con alta prevalencia de VIH, como <strong>Sudáfrica</strong>, <strong>Esuatini</strong> o <strong>Lesoto</strong>, y economías petroleras, como <strong>Nigeria</strong>, <strong>Guinea Ecuatorial</strong>, <strong>Gabón</strong> o <strong>Angola</strong>, donde el ingreso promedio es relativamente alto pero no llega a traducirse en salud. Nigeria, el país más poblado de África, vive 15 años menos de lo que su ingreso haría esperar.</p>
-      <p>El único país fuera de África entre los doce peores es <strong>Rusia</strong>. Y entre los países ricos, el caso más llamativo tal vez sea otro.</p>
+      <p>El único país fuera de África entre los doce peores es <strong>Rusia</strong>, y su déficit tiene un sesgo muy marcado. Las rusas viven 2,6 años menos de lo que predice el ingreso del país; los rusos, 7,9 años menos. La diferencia entre mujeres y varones, de 10,6 años, es la más grande del mundo, y se repite en otras ex repúblicas soviéticas como Letonia, Bielorrusia o Ucrania.</p>
+      <p>Pero entre los países ricos, el caso más llamativo tal vez sea otro.</p>
 
       <h2>Más dinero no compra más años</h2>
       <p><strong>Estados Unidos</strong> es la economía grande más rica del mundo por habitante y la que más gasta en salud: unos 13.500 dólares por persona por año, siete veces más que <strong>Costa Rica</strong>. Sin embargo, un costarricense vive en promedio dos años más que un estadounidense. Con su nivel de ingreso, Estados Unidos «debería» tener una esperanza de vida de 82 años; tiene 79.</p>
@@ -294,7 +296,8 @@
         <li>Gasto corriente en salud per cápita, PPA (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
         <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
       </ul>
-      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
+      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no depende de esa elección: con una curva cuadrática o con una regresión ponderada por población, las brechas casi no cambian (correlación mayor a 0,99). Tampoco es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
+      <p>Si al ingreso se le suma la mortalidad de menores de 5 años, la explicación sube del 74 % al <span data-cifra="r2-mortalidad">85 %</span>. Parte de la brecha se juega en la infancia, pero no toda: Estados Unidos tiene una mortalidad infantil baja en términos mundiales y aun así queda por debajo de lo esperado. Las brechas por sexo se calcularon con el mismo método, usando la esperanza de vida de mujeres y de varones.</p>
       <p>Hay que tener en cuenta algunas limitaciones. La esperanza de vida anual es una estimación de Naciones Unidas que se interpola a partir de datos quinquenales. Quedan afuera los países sin PIB en PPA reciente, como Cuba, Venezuela, Siria o Yemen. Y una correlación entre ingreso y salud no indica, por sí sola, en qué dirección va la causa.</p>
       <p>La exploración de la API, la limpieza de los datos y el análisis están en <a href="https://github.com/za0sec/infovis/tree/main/TPFinal/exploracion">notebooks de Python</a> que se pueden abrir en Colab. Los datos procesados se pueden descargar en <a href="datos/paises_2024.csv">CSV</a>.</p>
     </div>
@@ -365,6 +368,8 @@
       paises.sort((a, b) => b.poblacion - a.poblacion);
       document.querySelector('[data-cifra="duplicar"]').textContent = "+" + fmt.coma((modelo.b * Math.LN2).toFixed(1)) + " años";
       document.querySelector('[data-cifra="r2"]').textContent = Math.round(modelo.r2 * 100) + " %";
+      document.querySelector('[data-cifra="r2-mortalidad"]').textContent = Math.round(modelo.r2_mortalidad * 100) + " %";
+      document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
       dispersion(paises, modelo);
       ranking(paises);
       tabla(paises);
@@ -570,8 +575,18 @@
       function filas() {
         const universo = paises.filter(d => (chicos.checked || d.poblacion >= 1e6) && (!region.value || d.region === region.value))
           .sort((a, b) => b.brecha - a.brecha);
-        const recorte = universo.length <= N * 2 ? universo : [...universo.slice(0, N), ...universo.slice(-N)];
-        return { universo, recorte };
+        if (universo.length <= N * 2) return { universo, recorte: universo, huecos: [] };
+        // Argentina queda fija en el medio cuando no está entre los extremos, como referencia para el lector
+        const iArg = universo.findIndex(d => d.iso3 === "ARG");
+        const intermedios = universo.length - N * 2;
+        if (iArg >= N && iArg < universo.length - N) {
+          return {
+            universo,
+            recorte: [...universo.slice(0, N), universo[iArg], ...universo.slice(-N)],
+            huecos: [{ en: N, cantidad: iArg - N }, { en: N + 1, cantidad: intermedios - (iArg - N) - 1 }],
+          };
+        }
+        return { universo, recorte: [...universo.slice(0, N), ...universo.slice(-N)], huecos: [{ en: N, cantidad: intermedios }] };
       }
 
       function nota(universo) {
@@ -579,22 +594,22 @@
         const i = universo.findIndex(d => d.iso3 === "ARG");
         if (i < 0) { el.textContent = ""; return; }
         const arg = universo[i];
-        el.textContent = `Argentina: ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length}. Prácticamente sobre la línea.`;
+        el.textContent = `Argentina (destacada en el medio): ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length}. Prácticamente sobre la línea.`;
       }
 
       function dibujar() {
-        const { universo, recorte } = filas();
+        const { universo, recorte, huecos } = filas();
         nota(universo);
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
-        const fila = 24, corte = recorte.length === universo.length ? -1 : N;
-        const m = { top: 24, right: 44, bottom: 8, left: angosto ? 118 : 170 };
-        const alto = m.top + m.bottom + recorte.length * fila + (corte > 0 ? 18 : 0);
-        const yDe = i => m.top + i * fila + (corte > 0 && i >= corte ? 18 : 0);
+        const fila = 24, hueco = 18;
+        const m = { top: 24, right: angosto ? 36 : 44, bottom: 8, left: angosto ? 100 : 170 };
+        const alto = m.top + m.bottom + recorte.length * fila + huecos.length * hueco;
+        const yDe = i => m.top + i * fila + hueco * huecos.filter(h => i >= h.en).length;
 
         const x = d3.scaleLinear()
           .domain([Math.min(-2, d3.min(recorte, d => d.brecha)), Math.max(2, d3.max(recorte, d => d.brecha))])
-          .range([m.left, ancho - m.right]).nice();
+          .range([m.left + (angosto ? 34 : 44), ancho - m.right]).nice();
 
         d3.select(contenedor).select("svg").remove();
         const svg = d3.select(contenedor).insert("svg", ".tooltip")
@@ -603,18 +618,17 @@
           .attr("aria-label", "Ranking de países según cuántos años viven por encima o por debajo de lo esperado por su ingreso");
 
         svg.append("g").attr("class", "grilla")
-          .selectAll("line").data(x.ticks(angosto ? 4 : 8)).join("line")
+          .selectAll("line").data(x.ticks(angosto ? 3 : 8)).join("line")
           .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", m.top - 6).attr("y2", alto - m.bottom);
         svg.append("g").attr("class", "eje")
-          .selectAll("text").data(x.ticks(angosto ? 4 : 8)).join("text")
+          .selectAll("text").data(x.ticks(angosto ? 3 : 8)).join("text")
           .attr("x", d => x(d)).attr("y", m.top - 10).attr("text-anchor", "middle")
           .text(d => d === 0 ? "0" : fmt.signo(d).replace(",0", ""));
         svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.top - 6).attr("y2", alto - m.bottom)
           .attr("stroke", "var(--eje)");
-        if (corte > 0) {
-          svg.append("text").attr("class", "valor-fila").attr("x", x(0) - 8).attr("y", yDe(corte) - 4).attr("text-anchor", "end")
-            .text(`… ${universo.length - N * 2} países intermedios`);
-        }
+        svg.append("g").selectAll("text").data(huecos.filter(h => h.cantidad > 0)).join("text")
+          .attr("class", "valor-fila").attr("x", x(0) - 8).attr("y", h => yDe(h.en) - 4).attr("text-anchor", "end")
+          .text(h => `… ${h.cantidad} ${h.cantidad === 1 ? "país" : "países"}`);
 
         const alto_barra = 14;
         const barra = (d, i) => {
@@ -624,11 +638,11 @@
         };
         const color = d => d.brecha >= 0 ? "var(--mas-fuerte)" : "var(--menos-fuerte)";
 
-        const g = svg.append("g").selectAll("g").data(recorte).join("g");
+        const g = svg.append("g").selectAll("g").data(recorte).join("g").attr("class", d => d.iso3 === "ARG" ? "fila-argentina" : null);
         g.append("path").attr("d", barra).attr("fill", color);
         g.append("text").attr("class", d => "nombre-fila" + (d.iso3 === "ARG" ? " argentina" : ""))
           .attr("x", m.left - 8).attr("y", (d, i) => yDe(i) + fila / 2 + 4).attr("text-anchor", "end")
-          .text(d => d.pais.length > 18 && angosto ? d.pais.slice(0, 16) + "…" : d.pais);
+          .text(d => d.pais.length > 14 && angosto ? d.pais.slice(0, 13) + "…" : d.pais);
         g.append("text").attr("class", "valor-fila")
           .attr("x", d => x(d.brecha) + (d.brecha >= 0 ? 5 : -5)).attr("y", (d, i) => yDe(i) + fila / 2 + 4)
           .attr("text-anchor", d => d.brecha >= 0 ? "start" : "end")
@@ -642,6 +656,7 @@
               ["Diferencia", fmt.signo(d.brecha) + " años"],
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
               ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
+              ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
               ["PIB por habitante", fmt.dinero(d.pib)],
               ["Gasto en salud por hab.", d.gasto_salud ? fmt.dinero(d.gasto_salud) + ` (${d.anio_gasto})` : "s/d"],
               ["Mortalidad < 5 años", d.mortalidad_5 != null ? fmt.coma(d.mortalidad_5) + " ‰" : "s/d"],
