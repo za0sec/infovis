@@ -139,6 +139,12 @@
     .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
     .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
 
+    .lista { margin: 0 0 1.1em; padding-left: 1.2em; }
+    .lista li { margin-bottom: .3em; }
+    code { font: 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--texto-2); }
+    .leyenda i.trazo { width: 16px; height: 0; border-top: 2px solid; border-radius: 0; }
+    .anio { fill: var(--texto-3); font-size: 11px; paint-order: stroke; stroke: var(--superficie); stroke-width: 3px; }
+
     details.tabla { margin-top: 14px; font-size: 14px; }
     details.tabla summary { cursor: pointer; color: var(--acento); font-weight: 600; }
     .tabla-scroll { max-height: 420px; margin-top: 10px; overflow: auto; border: 1px solid var(--grilla); border-radius: 6px; }
@@ -236,6 +242,43 @@
       <p>Arriba del ranking conviven realidades muy distintas. <strong>Japón</strong> es el país rico que más se despega: vive casi cinco años más de lo que predice su ingreso, que ya es alto. Lo acompañan países de ingreso medio como <strong>Sri Lanka</strong>, <strong>Marruecos</strong> o <strong>Jordania</strong>, y varios latinoamericanos: <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más.</p>
       <p>Abajo, el patrón es más uniforme. Casi todo el fondo de la tabla es África subsahariana, donde se combinan dos historias: países con alta prevalencia de VIH, como <strong>Sudáfrica</strong>, <strong>Esuatini</strong> o <strong>Lesoto</strong>, y economías petroleras, como <strong>Nigeria</strong>, <strong>Guinea Ecuatorial</strong>, <strong>Gabón</strong> o <strong>Angola</strong>, donde el ingreso promedio es relativamente alto pero no llega a traducirse en salud. Nigeria, el país más poblado de África, vive 15 años menos de lo que su ingreso haría esperar.</p>
       <p>El único país fuera de África entre los doce peores es <strong>Rusia</strong>. Y entre los países ricos, el caso más llamativo tal vez sea otro.</p>
+
+      <h2>Más dinero no compra más años</h2>
+      <p><strong>Estados Unidos</strong> es la economía grande más rica del mundo por habitante y la que más gasta en salud: unos 13.500 dólares por persona por año, siete veces más que <strong>Costa Rica</strong>. Sin embargo, un costarricense vive en promedio dos años más que un estadounidense. Con su nivel de ingreso, Estados Unidos «debería» tener una esperanza de vida de 82 años; tiene 79.</p>
+      <p>La diferencia no apareció de un día para el otro. Si se sigue el recorrido de cada país desde 1990, se ve que el ingreso estadounidense siguió creciendo mientras su esperanza de vida se estancaba. Otros países, con mucho menos, avanzaron más rápido.</p>
+    </div>
+
+    <figure class="ancho" id="fig-trayectorias">
+      <div class="tarjeta">
+        <p class="grafico-titulo">El camino de cada país, de 1990 a 2024</p>
+        <p class="grafico-sub">Cada punto es un año. Hacia la derecha, el país se enriquece; hacia arriba, vive más. Elegí hasta tres países para comparar.</p>
+        <div class="controles" id="selectores"></div>
+        <div class="leyenda" id="leyenda-trayectorias"></div>
+        <div class="lienzo" id="trayectorias"><div class="tooltip" role="status"></div></div>
+      </div>
+      <figcaption>Esperanza de vida al nacer y PIB per cápita PPA (dólares internacionales de 2021), 1990–2024. Eje horizontal logarítmico. En gris, todos los países en 2024 y la línea de esperanza de vida esperada según el ingreso. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
+    </figure>
+
+    <div class="columna">
+      <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. El pozo que se ve en casi todas las trayectorias en 2020 y 2021 es la pandemia de COVID-19, de la que la mayoría de los países ya se recuperó.</p>
+      <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
+
+      <h2>Lo que dicen (y lo que no) estos datos</h2>
+      <p>El ingreso importa, y mucho: explica tres cuartas partes de las diferencias de esperanza de vida entre países. Pero el cuarto restante no es ruido. Hay países que, con recursos limitados, logran que su población viva como la de países que duplican o triplican su ingreso. Y hay otros donde la riqueza promedio no llega a la salud de la mayoría.</p>
+      <p>Los datos permiten encontrar esos casos, pero no explican por sí solos por qué ocurren. Detrás de cada brecha hay historias que exceden a un gráfico: la cobertura de la atención primaria, la desigualdad, las epidemias, la violencia, la dieta, el peso del petróleo en la economía. Lo que sí muestran con claridad es que <strong>vivir más no depende solo de ser más rico</strong>.</p>
+
+      <h2 id="metodologia">Cómo lo hicimos</h2>
+      <p>Todos los datos provienen de la <a href="https://data360.worldbank.org/en/api">API de Data360</a> del Banco Mundial, de la base <em>World Development Indicators</em>:</p>
+      <ul class="lista">
+        <li>Esperanza de vida al nacer, total (<code>WB_WDI_SP_DYN_LE00_IN</code>).</li>
+        <li>PIB per cápita en paridad de poder adquisitivo, dólares internacionales constantes de 2021 (<code>WB_WDI_NY_GDP_PCAP_PP_KD</code>).</li>
+        <li>Población total (<code>WB_WDI_SP_POP_TOTL</code>).</li>
+        <li>Gasto corriente en salud per cápita, PPA (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
+        <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
+      </ul>
+      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
+      <p>Hay que tener en cuenta algunas limitaciones. La esperanza de vida anual es una estimación de Naciones Unidas que se interpola a partir de datos quinquenales. Quedan afuera los países sin PIB en PPA reciente, como Cuba, Venezuela, Siria o Yemen. Y una correlación entre ingreso y salud no indica, por sí sola, en qué dirección va la causa.</p>
+      <p>La exploración de la API, la limpieza de los datos y el análisis están en <a href="https://github.com/za0sec/infovis/tree/main/TPFinal/exploracion">notebooks de Python</a> que se pueden abrir en Colab. Los datos procesados se pueden descargar en <a href="datos/paises_2024.csv">CSV</a>.</p>
     </div>
   </article>
 
@@ -306,6 +349,7 @@
       dispersion(paises, modelo);
       ranking(paises);
       tabla(paises);
+      d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
     });
 
     function dispersion(paises, modelo) {
@@ -553,6 +597,135 @@
           .selectAll("td").data(d => columnas.map(c => c.texto(d))).join("td").text(v => v);
       }
       pintar();
+    }
+    function trayectorias(paises, puntos, modelo) {
+      const contenedor = document.getElementById("trayectorias");
+      const tip = tooltip(contenedor);
+      const porPais = d3.group(puntos, d => d.iso3);
+      const nombre = new Map(paises.map(d => [d.iso3, d.pais]));
+      const opciones = paises.filter(d => porPais.has(d.iso3)).sort((a, b) => d3.ascending(a.pais, b.pais));
+      const SERIES = ["--serie-1", "--serie-2", "--serie-3"];
+      const elegidos = ["USA", "CRI", "CHL"];
+
+      const selects = d3.select("#selectores").selectAll("label").data(elegidos).join("label")
+        .text((d, i) => `País ${i + 1}`)
+        .append("select")
+        .on("change", function (ev, d) {
+          const i = selects.nodes().indexOf(this);
+          elegidos[i] = this.value;
+          dibujar();
+        });
+      selects.selectAll("option").data(i => [{ iso3: "", pais: "—" }, ...opciones]).join("option")
+        .attr("value", d => d.iso3).text(d => d.pais);
+      selects.property("value", d => d);
+
+      function dibujar() {
+        const activos = elegidos.map((iso3, i) => ({ iso3, color: `var(${SERIES[i]})` })).filter(d => d.iso3);
+        d3.select("#leyenda-trayectorias").selectAll("span").data(activos, d => d.iso3).join("span")
+          .call(s => s.selectAll("*").remove())
+          .call(s => s.append("i").attr("class", "trazo").style("border-color", d => d.color))
+          .call(s => s.append("span").text(d => nombre.get(d.iso3)));
+
+        const ancho = contenedor.clientWidth;
+        const angosto = ancho < 560;
+        const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
+        const m = { top: 12, right: angosto ? 16 : 24, bottom: 46, left: 44 };
+
+        const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3).filter(d => d.pib && d.vida) }));
+        const todos = recorridos.flatMap(r => r.datos);
+        // En pantallas angostas el encuadre se ajusta a los países elegidos para que las trayectorias se lean mejor
+        const xDom = d3.extent(angosto && todos.length ? todos.map(d => d.pib) : [...todos.map(d => d.pib), 2000, 60000]);
+        const yDom = d3.extent(angosto && todos.length ? todos.map(d => d.vida) : [...todos.map(d => d.vida), 60, 85]);
+        const x = d3.scaleLog().domain([xDom[0] * .85, xDom[1] * 1.15]).range([m.left, ancho - m.right]);
+        const y = d3.scaleLinear().domain([Math.floor(yDom[0] - 1), Math.ceil(yDom[1] + 1)]).range([alto - m.bottom, m.top]).nice();
+
+        d3.select(contenedor).select("svg").remove();
+        const svg = d3.select(contenedor).insert("svg", ".tooltip")
+          .attr("viewBox", `0 0 ${ancho} ${alto}`)
+          .attr("role", "img")
+          .attr("aria-label", "Trayectorias de ingreso y esperanza de vida entre 1990 y 2024 de " + activos.map(a => nombre.get(a.iso3)).join(", "));
+
+        svg.append("g").attr("class", "grilla")
+          .selectAll("line").data(y.ticks(6)).join("line")
+          .attr("x1", m.left).attr("x2", ancho - m.right).attr("y1", d => y(d)).attr("y2", d => y(d));
+        const candidatos = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000].filter(v => v >= x.domain()[0] && v <= x.domain()[1]);
+        svg.append("g").attr("class", "eje").attr("transform", `translate(0,${alto - m.bottom})`)
+          .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0))
+          .call(g => g.select(".domain").remove());
+        svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
+          .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
+          .call(g => g.select(".domain").remove());
+        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
+          .text("PIB por habitante (US$ PPA, escala log) →");
+        svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2).text("↑ Años de vida");
+
+        const plano = svg.append("g").attr("clip-path", null);
+        const enRango = d => d.pib >= x.domain()[0] && d.pib <= x.domain()[1] && d.vida >= y.domain()[0] && d.vida <= y.domain()[1];
+        plano.append("g").selectAll("circle").data(paises.filter(enRango)).join("circle")
+          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", 3)
+          .attr("fill", "var(--neutro)").attr("opacity", .45);
+        const curva = d3.range(Math.log(x.domain()[0]), Math.log(x.domain()[1]), 0.05)
+          .map(l => [Math.exp(l), modelo.a + modelo.b * l]).filter(d => d[1] >= y.domain()[0] && d[1] <= y.domain()[1]);
+        plano.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
+          .attr("fill", "none").attr("stroke", "var(--recta)").attr("stroke-width", 1.5).attr("opacity", .5);
+
+        const linea = d3.line(d => x(d.pib), d => y(d.vida)).curve(d3.curveCatmullRom.alpha(.5));
+        const capas = plano.append("g").selectAll("g").data(recorridos).join("g");
+        capas.append("path").attr("d", r => linea(r.datos))
+          .attr("fill", "none").attr("stroke", r => r.color).attr("stroke-width", 2)
+          .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
+        capas.selectAll("circle").data(r => r.datos.map(d => ({ ...d, color: r.color }))).join("circle")
+          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida))
+          .attr("r", (d, i, n) => i === n.length - 1 ? 5 : 1.8)
+          .attr("fill", d => d.color).attr("stroke", "var(--superficie)").attr("stroke-width", (d, i, n) => i === n.length - 1 ? 2 : 0.8);
+
+        capas.append("text").attr("class", "anio")
+          .attr("x", r => x(r.datos[0].pib)).attr("y", r => y(r.datos[0].vida) + 15).attr("text-anchor", "middle")
+          .text(r => r.datos[0].anio);
+        capas.append("text").attr("class", "etiqueta")
+          .each(function (r) {
+            const ultimo = r.datos[r.datos.length - 1];
+            const izquierda = x(ultimo.pib) > ancho - m.right - 100;
+            d3.select(this).attr("x", x(ultimo.pib) + (izquierda ? -9 : 9)).attr("y", y(ultimo.vida) - 8)
+              .attr("text-anchor", izquierda ? "end" : "start").text(nombre.get(r.iso3));
+          });
+        // Las etiquetas se ubican de arriba hacia abajo; si una pisa a otra, pasa debajo de su punto y, si hace falta, al otro lado
+        const ocupadas = [];
+        const choca = c => ocupadas.some(o => c.x < o.x + o.width && o.x < c.x + c.width && c.y < o.y + o.height && o.y < c.y + c.height);
+        const etiquetas = capas.select("text.etiqueta").nodes()
+          .sort((p, q) => d3.select(p).datum().datos.at(-1).vida < d3.select(q).datum().datos.at(-1).vida ? 1 : -1);
+        for (const nodo of etiquetas) {
+          const t = d3.select(nodo), ultimo = t.datum().datos.at(-1);
+          if (choca(nodo.getBBox())) t.attr("y", y(ultimo.vida) + 18);
+          if (choca(nodo.getBBox())) {
+            const aDerecha = t.attr("text-anchor") === "end";
+            t.attr("x", x(ultimo.pib) + (aDerecha ? 9 : -9)).attr("text-anchor", aDerecha ? "start" : "end");
+          }
+          ocupadas.push(nodo.getBBox());
+        }
+
+        const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("r", 6).attr("opacity", 0);
+        const objetivos = recorridos.flatMap(r => r.datos.map(d => ({ ...d, iso3: r.iso3 })));
+        const delaunay = d3.Delaunay.from(objetivos, d => x(d.pib), d => y(d.vida));
+        svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
+          .on("pointermove", ev => {
+            if (!objetivos.length) return;
+            const [px, py] = d3.pointer(ev);
+            const d = objetivos[delaunay.find(px, py)];
+            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 36) { tip.ocultar(); anillo.attr("opacity", 0); return; }
+            anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("opacity", 1);
+            const inicio = porPais.get(d.iso3).find(p => p.pib && p.vida);
+            tip.mostrar([
+              ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
+              ["PIB por habitante", fmt.dinero(d.pib)],
+              [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
+            ], nombre.get(d.iso3), String(d.anio), x(d.pib), y(d.vida));
+          })
+          .on("pointerleave", () => { tip.ocultar(); anillo.attr("opacity", 0); });
+      }
+
+      dibujar();
+      redibujarAlCambiarAncho(contenedor, dibujar);
     }
   </script>
 </body>
