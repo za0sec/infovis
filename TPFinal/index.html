@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vivir más sin ser más rico</title>
+  <meta name="description" content="Qué países viven más (y menos) de lo que predice su ingreso. Datos del Banco Mundial (Data360).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --pagina: #f9f9f7;
+      --superficie: #fcfcfb;
+      --texto: #0b0b0b;
+      --texto-2: #52514e;
+      --texto-3: #898781;
+      --grilla: #e1e0d9;
+      --eje: #c3c2b7;
+      --borde: rgba(11, 11, 11, .10);
+      --acento: #256abf;
+
+      --mas-fuerte: #256abf;
+      --mas-suave: #86b6ef;
+      --neutro: #c9c7bf;
+      --menos-suave: #f0a3a2;
+      --menos-fuerte: #d03b3b;
+      --recta: #52514e;
+
+      --serie-1: #2a78d6;
+      --serie-2: #eb6834;
+      --serie-3: #1baf7a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --pagina: #0d0d0d;
+        --superficie: #1a1a19;
+        --texto: #f0efec;
+        --texto-2: #c3c2b7;
+        --texto-3: #898781;
+        --grilla: #2c2c2a;
+        --eje: #383835;
+        --borde: rgba(255, 255, 255, .10);
+        --acento: #6da7ec;
+        --mas-fuerte: #6da7ec;
+        --mas-suave: #2f5f9c;
+        --neutro: #5b5a55;
+        --menos-suave: #8f3b3b;
+        --menos-fuerte: #e66767;
+        --recta: #c3c2b7;
+        --serie-1: #3987e5;
+        --serie-2: #d95926;
+        --serie-3: #199e70;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --pagina: #0d0d0d;
+      --superficie: #1a1a19;
+      --texto: #f0efec;
+      --texto-2: #c3c2b7;
+      --texto-3: #898781;
+      --grilla: #2c2c2a;
+      --eje: #383835;
+      --borde: rgba(255, 255, 255, .10);
+      --acento: #6da7ec;
+      --mas-fuerte: #6da7ec;
+      --mas-suave: #2f5f9c;
+      --neutro: #5b5a55;
+      --menos-suave: #8f3b3b;
+      --menos-fuerte: #e66767;
+      --recta: #c3c2b7;
+      --serie-1: #3987e5;
+      --serie-2: #d95926;
+      --serie-3: #199e70;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--pagina); color: var(--texto); font: 17px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .columna { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+    .ancho { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    header.columna { padding-top: 56px; padding-bottom: 28px; }
+    .volanta { margin: 0 0 18px; color: var(--acento); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 0; font: 600 clamp(38px, 6vw, 60px)/1.05 "Source Serif 4", Georgia, serif; letter-spacing: -.02em; }
+    .bajada { margin: 18px 0 0; color: var(--texto-2); font: 400 clamp(19px, 2.4vw, 23px)/1.45 "Source Serif 4", Georgia, serif; }
+    .firma { margin: 26px 0 0; padding: 14px 0 0; border-top: 1px solid var(--grilla); color: var(--texto-3); font-size: 14px; }
+
+    article p { margin: 0 0 1.1em; }
+    article h2 { margin: 2.2em 0 .6em; font: 600 28px/1.2 "Source Serif 4", Georgia, serif; letter-spacing: -.01em; }
+    strong { font-weight: 600; }
+
+    .cifras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 34px 0 40px; background: var(--grilla); border: 1px solid var(--grilla); }
+    .cifra { padding: 18px 18px 16px; background: var(--superficie); }
+    .cifra b { display: block; font-size: 34px; font-weight: 600; line-height: 1.1; letter-spacing: -.02em; }
+    .cifra span { display: block; margin-top: 6px; color: var(--texto-2); font-size: 14px; line-height: 1.4; }
+
+    figure.ancho { margin: 40px auto 48px; }
+    .tarjeta { padding: 22px 22px 16px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; }
+    .grafico-titulo { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.3; }
+    .grafico-sub { margin: 4px 0 14px; color: var(--texto-2); font-size: 15px; line-height: 1.45; }
+    figcaption { margin-top: 10px; color: var(--texto-3); font-size: 13px; line-height: 1.5; }
+    figcaption a { color: inherit; }
+
+    .controles { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-bottom: 12px; font-size: 14px; color: var(--texto-2); }
+    .controles label { display: flex; gap: 8px; align-items: center; }
+    select { max-width: 100%; min-width: 0; }
+    select, input[type="search"] { min-height: 34px; padding: 4px 10px; border: 1px solid var(--eje); border-radius: 6px; background: var(--superficie); color: var(--texto); font: inherit; }
+    input[type="search"] { width: 200px; }
+
+    .leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 6px; color: var(--texto-2); font-size: 13px; }
+    .leyenda span { display: inline-flex; gap: 6px; align-items: center; }
+    .leyenda i { width: 10px; height: 10px; border-radius: 50%; }
+    .leyenda i.linea { width: 16px; height: 0; border-top: 1.5px solid var(--recta); border-radius: 0; }
+
+    .lienzo { position: relative; }
+    .lienzo svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .eje text { fill: var(--texto-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .eje line, .eje path { stroke: var(--eje); }
+    .grilla line { stroke: var(--grilla); }
+    .titulo-eje { fill: var(--texto-2); font-size: 12px; }
+    .etiqueta { fill: var(--texto); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+    .etiqueta.suave { fill: var(--texto-2); font-weight: 400; }
+
+    .tooltip { position: absolute; z-index: 5; min-width: 190px; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, .14); font-size: 13px; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity .12s; }
+    .tooltip.visible { opacity: 1; }
+    .tooltip .t-pais { font-size: 14px; font-weight: 600; }
+    .tooltip .t-region { margin-bottom: 6px; color: var(--texto-3); font-size: 12px; }
+    .tooltip dl { display: grid; grid-template-columns: auto auto; gap: 1px 14px; margin: 0; }
+    .tooltip dt { color: var(--texto-2); }
+    .tooltip dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+
+    footer { margin-top: 64px; padding: 28px 0 60px; border-top: 1px solid var(--grilla); color: var(--texto-3); font-size: 14px; }
+    a { color: var(--acento); }
+
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      header.columna { padding-top: 36px; }
+      .cifras { grid-template-columns: 1fr; }
+      .tarjeta { padding: 16px 12px 12px; }
+      input[type="search"] { width: 100%; }
+      .controles label { flex: 1 1 100%; min-width: 0; }
+      .controles select { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="columna">
+    <p class="volanta">Salud y desarrollo · Datos del Banco Mundial</p>
+    <h1>Vivir más sin ser más rico</h1>
+    <p class="bajada">En casi todo el mundo, más ingreso significa más años de vida. Pero algunos países rompen la regla: viven como países ricos sin serlo, o mueren antes de lo que su riqueza haría esperar.</p>
+    <p class="firma">Trabajo Práctico Final · Visualización de la Información · Noviembre de 2026</p>
+  </header>
+
+  <article>
+    <div class="columna">
+      <p>Un bebé que nace hoy en Japón puede esperar vivir 84 años. Uno que nace en Nigeria, 55. Casi 30 años de diferencia que, en buena medida, se explican por algo bastante obvio: el dinero. Los países con más ingreso por habitante tienen mejor alimentación, agua potable, hospitales y medicamentos.</p>
+      <p>La relación es tan fuerte que permite hacer una predicción. Si uno conoce el ingreso promedio de un país, puede estimar con bastante precisión cuánto vive su población. Lo interesante es cuando la predicción falla.</p>
+
+      <div class="cifras" id="cifras">
+        <div class="cifra"><b data-cifra="duplicar">+3,6 años</b><span>de esperanza de vida, en promedio, cada vez que se duplica el ingreso por habitante</span></div>
+        <div class="cifra"><b data-cifra="r2">74 %</b><span>de las diferencias entre países se explica solo con el ingreso</span></div>
+        <div class="cifra"><b>2,1 años</b><span>más vive Costa Rica que Estados Unidos, con un tercio de su ingreso</span></div>
+      </div>
+    </div>
+
+    <figure class="ancho" id="fig-dispersion">
+      <div class="tarjeta">
+        <p class="grafico-titulo">Más ingreso, más años de vida… casi siempre</p>
+        <p class="grafico-sub">Cada círculo es un país, con tamaño proporcional a su población. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
+        <div class="controles">
+          <label>Buscar un país <input type="search" id="buscar" list="lista-paises" placeholder="Ej.: Argentina" autocomplete="off"></label>
+          <datalist id="lista-paises"></datalist>
+          <label>Región
+            <select id="region">
+              <option value="">Todas</option>
+            </select>
+          </label>
+        </div>
+        <div class="leyenda" id="leyenda-brecha"></div>
+        <div class="lienzo" id="dispersion"><div class="tooltip" role="status"></div></div>
+      </div>
+      <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales de 2021), 2024. El eje horizontal es logarítmico: cada marca duplica o multiplica el ingreso. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
+    </figure>
+
+    <div class="columna">
+      <p>La línea resume la regla general. En la parte baja de la escala, unos pocos miles de dólares adicionales por persona cambian mucho la expectativa de vida; en la parte alta, el efecto se achica. Por eso el eje está en escala logarítmica: así la relación se vuelve casi una recta, y cada duplicación del ingreso suma, en promedio, unos tres años y medio.</p>
+      <p>Los países en <strong>azul</strong> viven más de lo que predice su ingreso. Los países en <strong>rojo</strong>, menos.</p>
+    </div>
+  </article>
+
+  <footer>
+    <div class="columna">
+      <p>Datos: Banco Mundial, <a href="https://data360.worldbank.org/">Data360</a> (World Development Indicators). Análisis y notebooks en <a href="https://github.com/za0sec/infovis/tree/main/TPFinal">GitHub</a>.</p>
+    </div>
+  </footer>
+
+  <script>
+    const fmt = {
+      anios: d3.format(".1f"),
+      dinero: v => "US$ " + d3.format(",.0f")(v).replace(/,/g, "."),
+      pob: v => v >= 1e6 ? d3.format(".1f")(v / 1e6).replace(".", ",") + " millones" : d3.format(",.0f")(v).replace(/,/g, ".") + " hab.",
+      signo: v => (v > 0 ? "+" : v < 0 ? "−" : "") + d3.format(".1f")(Math.abs(v)).replace(".", ","),
+      coma: v => String(v).replace(".", ","),
+    };
+    const css = nombre => getComputedStyle(document.documentElement).getPropertyValue(nombre).trim();
+
+    const CLASES = [
+      { min: 4, nombre: "4 años o más por encima", token: "--mas-fuerte" },
+      { min: 1.5, nombre: "1,5 a 4 por encima", token: "--mas-suave" },
+      { min: -1.5, nombre: "Cerca de lo esperado", token: "--neutro" },
+      { min: -4, nombre: "1,5 a 4 por debajo", token: "--menos-suave" },
+      { min: -Infinity, nombre: "4 años o más por debajo", token: "--menos-fuerte" },
+    ];
+    const claseDe = brecha => CLASES.find(c => brecha >= c.min);
+
+    function tooltip(contenedor) {
+      const el = contenedor.querySelector(".tooltip");
+      return {
+        mostrar(filas, titulo, subtitulo, x, y) {
+          el.replaceChildren();
+          const t = document.createElement("div"); t.className = "t-pais"; t.textContent = titulo;
+          const s = document.createElement("div"); s.className = "t-region"; s.textContent = subtitulo;
+          const dl = document.createElement("dl");
+          for (const [k, v] of filas) {
+            const dt = document.createElement("dt"); dt.textContent = k;
+            const dd = document.createElement("dd"); dd.textContent = v;
+            dl.append(dt, dd);
+          }
+          el.append(t, s, dl);
+          const ancho = contenedor.clientWidth, w = el.offsetWidth, h = el.offsetHeight;
+          el.style.left = Math.max(0, Math.min(x + 14, ancho - w)) + "px";
+          el.style.top = Math.max(0, y - h - 12) + "px";
+          el.classList.add("visible");
+        },
+        ocultar() { el.classList.remove("visible"); },
+      };
+    }
+
+    function redibujarAlCambiarAncho(el, dibujar) {
+      let ancho = el.clientWidth, espera;
+      new ResizeObserver(() => {
+        if (el.clientWidth === ancho) return;
+        ancho = el.clientWidth;
+        clearTimeout(espera);
+        espera = setTimeout(dibujar, 120);
+      }).observe(el);
+    }
+
+    Promise.all([
+      d3.csv("datos/paises_2024.csv", d3.autoType),
+      d3.json("datos/modelo.json"),
+    ]).then(([paises, modelo]) => {
+      paises.sort((a, b) => b.poblacion - a.poblacion);
+      document.querySelector('[data-cifra="duplicar"]').textContent = "+" + fmt.coma((modelo.b * Math.LN2).toFixed(1)) + " años";
+      document.querySelector('[data-cifra="r2"]').textContent = Math.round(modelo.r2 * 100) + " %";
+      dispersion(paises, modelo);
+    });
+
+    function dispersion(paises, modelo) {
+      const contenedor = document.getElementById("dispersion");
+      const tip = tooltip(contenedor);
+      const buscar = document.getElementById("buscar");
+      const region = document.getElementById("region");
+      // Posición de la etiqueta respecto del círculo para evitar choques en la zona más poblada
+      const DESTACADOS = { USA: "der", CRI: "der", CHL: "arriba", JPN: "der", NGA: "der", RUS: "der", ARG: "der",
+                           ZAF: "der", GNQ: "der", LKA: "izq", IND: "der" };
+      const DESTACADOS_MOVIL = { USA: "abajo", CRI: "izq", NGA: "der" };
+
+      d3.select("#lista-paises").selectAll("option").data(paises.map(d => d.pais).sort(d3.ascending))
+        .join("option").attr("value", d => d);
+      d3.select(region).selectAll("option.r").data([...new Set(paises.map(d => d.region))].sort(d3.ascending))
+        .join("option").attr("class", "r").attr("value", d => d).text(d => d);
+
+      const leyenda = d3.select("#leyenda-brecha");
+      leyenda.selectAll("span").data(CLASES).join("span")
+        .call(s => s.append("i").style("background", c => `var(${c.token})`))
+        .call(s => s.append("span").text(c => c.nombre));
+      leyenda.append("span").call(s => s.append("i").attr("class", "linea"))
+        .call(s => s.append("span").text("Esperada según el ingreso"));
+
+      let seleccion = null;
+
+      function dibujar() {
+        const ancho = contenedor.clientWidth;
+        const angosto = ancho < 560;
+        const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
+        const m = { top: 12, right: 14, bottom: 46, left: 44 };
+
+        const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
+        const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
+        const r = d3.scaleSqrt().domain([0, d3.max(paises, d => d.poblacion)]).range([0, angosto ? 22 : 34]);
+
+        d3.select(contenedor).select("svg").remove();
+        const svg = d3.select(contenedor).insert("svg", ".tooltip")
+          .attr("viewBox", `0 0 ${ancho} ${alto}`)
+          .attr("role", "img")
+          .attr("aria-label", "Gráfico de dispersión: esperanza de vida según el ingreso por habitante de cada país en 2024");
+
+        const marcas = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
+        svg.append("g").attr("class", "grilla")
+          .selectAll("line").data(y.ticks(6)).join("line")
+          .attr("x1", m.left).attr("x2", ancho - m.right).attr("y1", d => y(d)).attr("y2", d => y(d));
+        svg.append("g").attr("class", "eje").attr("transform", `translate(0,${alto - m.bottom})`)
+          .call(d3.axisBottom(x).tickValues(angosto ? [1000, 5000, 20000, 100000] : marcas)
+            .tickFormat(v => v >= 1000 ? (v / 1000) + " mil" : v).tickSizeOuter(0))
+          .call(g => g.select(".domain").remove());
+        svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
+          .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
+          .call(g => g.select(".domain").remove());
+        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
+          .text("PIB por habitante (US$ PPA, escala log) →");
+        svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2)
+          .text("↑ Años de vida");
+
+        const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
+        svg.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
+          .attr("fill", "none").attr("stroke", "var(--recta)").attr("stroke-width", 1.5).attr("opacity", .7);
+
+        const filtro = region.value;
+        const activo = d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
+
+        const puntos = svg.append("g").selectAll("circle").data(paises).join("circle")
+          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", d => Math.max(3.5, r(d.poblacion)))
+          .attr("fill", d => `var(${claseDe(d.brecha).token})`)
+          .attr("fill-opacity", d => activo(d) ? .88 : .12)
+          .attr("stroke", "var(--superficie)").attr("stroke-width", 1.5);
+
+        const etiquetados = seleccion ? [seleccion]
+          : paises.filter(d => (filtro ? d.region === filtro && Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
+              .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
+        const lado = d => {
+          const preferido = (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS)[d.iso3] || "der";
+          return preferido === "der" && x(d.pib) > ancho - m.right - 110 ? "izq" : preferido;
+        };
+        const radio = d => Math.max(3.5, r(d.poblacion));
+        svg.append("g").selectAll("text").data(etiquetados).join("text")
+          .attr("class", "etiqueta")
+          .attr("x", d => x(d.pib) + ({ der: radio(d) + 4, izq: -radio(d) - 4, arriba: 0, abajo: 0 })[lado(d)])
+          .attr("y", d => y(d.vida) + (({ arriba: -radio(d) - 6, abajo: radio(d) + 14 })[lado(d)] ?? 4))
+          .attr("text-anchor", d => ({ der: "start", izq: "end" })[lado(d)] ?? "middle")
+          .text(d => d.pais);
+
+        const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("opacity", 0);
+
+        const delaunay = d3.Delaunay.from(paises, d => x(d.pib), d => y(d.vida));
+        const mostrar = (d) => {
+          anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("r", Math.max(3.5, r(d.poblacion)) + 3).attr("opacity", 1);
+          tip.mostrar([
+            ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
+            ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
+            ["Diferencia", fmt.signo(d.brecha) + " años"],
+            ["PIB por habitante", fmt.dinero(d.pib)],
+            ["Población", fmt.pob(d.poblacion)],
+          ], d.pais, d.region, x(d.pib), y(d.vida));
+        };
+        svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
+          .on("pointermove", ev => {
+            const [px, py] = d3.pointer(ev);
+            const d = paises[delaunay.find(px, py)];
+            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { tip.ocultar(); anillo.attr("opacity", 0); return; }
+            mostrar(d);
+          })
+          .on("pointerleave", () => {
+            tip.ocultar();
+            if (seleccion) mostrar(seleccion); else anillo.attr("opacity", 0);
+          });
+
+        if (seleccion) mostrar(seleccion);
+      }
+
+      buscar.addEventListener("input", () => {
+        const texto = buscar.value.trim().toLowerCase();
+        seleccion = paises.find(d => d.pais.toLowerCase() === texto) || null;
+        if (seleccion) region.value = "";
+        if (!texto || seleccion) dibujar();
+        if (!seleccion) tip.ocultar();
+      });
+      region.addEventListener("change", () => { seleccion = null; buscar.value = ""; tip.ocultar(); dibujar(); });
+
+      dibujar();
+      redibujarAlCambiarAncho(contenedor, dibujar);
+    }
+  </script>
+</body>
+</html>
