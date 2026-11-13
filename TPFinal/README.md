@@ -7,12 +7,13 @@ Trabajo práctico final de Visualización de la Información sobre datos de [Wor
 | Carpeta | Contenido |
 |---|---|
 | `exploracion/` | Notebooks (Colab) de la etapa exploratoria |
+| `datos/` | Datos procesados que usan las visualizaciones |
 
 ## Cómo correr los notebooks
 
 Se pueden abrir directamente en Google Colab. Localmente:
 
 ```bash
-pip install pandas requests duckdb altair
+pip install pandas requests duckdb altair babel pycountry
 jupyter lab TPFinal/exploracion
 ```
