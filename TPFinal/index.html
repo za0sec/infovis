@@ -113,8 +113,9 @@
 
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--pagina); color: var(--texto); font: 17px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
-    .columna { max-width: 680px; margin: 0 auto; padding: 0 20px; }
-    .ancho { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+    .columna, .ancho { margin-inline: auto; padding-inline: clamp(16px, 3vw, 24px); }
+    .columna { max-width: clamp(680px, 72vw, 860px); }
+    .ancho { max-width: 1040px; }
 
     header.columna { padding-top: 56px; padding-bottom: 28px; }
     .volanta { margin: 0 0 18px; color: var(--acento); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
@@ -124,13 +125,14 @@
     .firma strong { color: var(--texto-2); font-weight: 600; }
 
     article p { margin: 0 0 1.1em; }
+    article .columna > p { text-wrap: pretty; }
     article h2 { margin: 2.2em 0 .6em; font: 600 28px/1.2 "Source Serif 4", Georgia, serif; letter-spacing: -.01em; }
     strong { font-weight: 600; }
 
-    .cifras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 34px 0 40px; background: var(--grilla); border: 1px solid var(--grilla); }
-    .cifra { padding: 18px 18px 16px; background: var(--superficie); }
-    .cifra b { display: block; font-size: 34px; font-weight: 600; line-height: 1.1; letter-spacing: -.02em; }
-    .cifra span { display: block; margin-top: 6px; color: var(--texto-2); font-size: 14px; line-height: 1.4; }
+    .cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: clamp(24px, 3vw, 34px) 0 clamp(28px, 4vw, 40px); background: var(--grilla); border: 1px solid var(--grilla); }
+    .cifra { padding: clamp(14px, 2vw, 20px); background: var(--superficie); }
+    .cifra b { display: block; font-size: clamp(26px, 3.2vw, 34px); font-weight: 600; line-height: 1.1; letter-spacing: -.02em; }
+    .cifra span { display: block; margin-top: 6px; color: var(--texto-2); font-size: 14px; line-height: 1.4; text-wrap: pretty; }
 
     figure.ancho { margin: 40px auto 48px; }
     .tarjeta { padding: 22px 22px 16px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; }
