@@ -156,8 +156,6 @@
     #trayectorias [role="slider"]:focus { outline: none; }
     #trayectorias [role="slider"]:focus-visible .recorrido-anual { stroke-width: 3.5; }
     .ayuda-teclado { margin: 0 0 10px; color: var(--texto-2); font-size: 13px; }
-    .paso-texto { min-height: 3.1em; margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--acento); background: var(--pagina); color: var(--texto); font-size: 15px; line-height: 1.5; }
-    .paso-texto:empty { display: none; }
     #pasos { gap: 8px; }
     #pasos button {
       display: inline-flex; align-items: center; gap: 8px;
@@ -172,7 +170,6 @@
       background: color-mix(in srgb, var(--color-paso) 15%, var(--superficie));
       color: var(--texto); font-weight: 600;
     }
-    #paso-texto { border-left-color: var(--color-paso, var(--recta)); }
     .controles-dispersion { gap: 10px; align-items: stretch; }
     .controles-dispersion label { display: grid; gap: 4px; flex: 1 1 210px; min-width: 0; }
     .controles-dispersion label span { font-size: 13px; font-weight: 600; }
@@ -189,6 +186,7 @@
     .lienzo svg { display: block; width: 100%; height: auto; overflow: visible; }
     .eje text { fill: var(--texto-3); font-size: 12px; font-variant-numeric: tabular-nums; }
     .eje line, .eje path { stroke: var(--eje); }
+    .eje .domain, .eje-referencia { stroke: var(--texto-3); stroke-width: 1.2; }
     .grilla line { stroke: var(--grilla); }
     .titulo-eje { fill: var(--texto-2); font-size: 12px; }
     .etiqueta { fill: var(--texto); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
@@ -211,9 +209,10 @@
     #ranking .tooltip dl { font-size: 12px; }
     #dispersion .ficha-pais dl { grid-template-columns: 1fr; gap: 4px; }
     .ficha-pais dl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: baseline; }
-    #dispersion.ficha-interior .ficha-pais { position: absolute; right: 14px; bottom: 60px; margin: 0; }
+    #dispersion .ficha-pais { position: absolute; margin: 0; }
+    #dispersion.ficha-estrecha .ficha-pais { width: 100%; padding: 8px 10px; font-size: 12px; }
     @media (max-width: 640px) {
-      :is(#dispersion, #ranking, #trayectorias) .tooltip { width: 100%; }
+      :is(#ranking, #trayectorias) .tooltip { width: 100%; }
     }
 
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
@@ -281,11 +280,10 @@
         <h2 class="grafico-titulo">¿Los países con mayor ingreso viven más?</h2>
         <p class="grafico-sub">El área de cada círculo es proporcional a la población de la economía. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
         <div class="pasos" id="pasos" aria-label="Recorrido guiado por el gráfico"></div>
-        <p class="paso-texto" id="paso-texto" aria-live="polite"></p>
         <div class="controles controles-dispersion">
           <label><span>Buscar un país</span><input type="search" id="buscar" list="lista-paises" placeholder="Ej.: Argentina" autocomplete="off"></label>
           <datalist id="lista-paises"></datalist>
-          <label><span>Resaltar por región</span>
+          <label><span>Filtrar por región</span>
             <select id="region">
               <option value="">Todas</option>
             </select>
@@ -494,15 +492,44 @@
       const contenedor = document.getElementById("dispersion");
       const ficha = contenedor.querySelector(".ficha-pais");
       let ultimaFicha = null;
+      let areaFicha, marcasFicha = [];
+      const seSuperponen = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
       function ubicarFicha() {
-        contenedor.classList.toggle("ficha-interior", contenedor.clientWidth >= 900);
-        if (!contenedor.classList.contains("ficha-interior")) return;
-        const caja = ficha.getBoundingClientRect();
-        const tapaPuntos = [...contenedor.querySelectorAll("svg circle, svg .etiqueta")].some(punto => {
-          const p = punto.getBoundingClientRect();
-          return p.right > caja.left && p.left < caja.right && p.bottom > caja.top && p.top < caja.bottom;
-        });
-        if (tapaPuntos) contenedor.classList.remove("ficha-interior");
+        if (!areaFicha) return;
+        const estrecho = contenedor.clientWidth < 500;
+        contenedor.classList.toggle("ficha-estrecha", estrecho);
+        if (estrecho) {
+          ficha.style.maxWidth = "100%";
+          ficha.style.left = "0";
+          ficha.style.top = "0";
+          contenedor.style.paddingTop = `${ficha.offsetHeight + 8}px`;
+          return;
+        }
+        contenedor.style.paddingTop = "";
+        const { left, top, right, bottom } = areaFicha;
+        ficha.style.maxWidth = `${right - left}px`;
+        const ancho = ficha.offsetWidth, alto = ficha.offsetHeight;
+        const derecha = right - ancho, abajo = Math.max(top, bottom - alto);
+        const posicionesX = [derecha, ...d3.range(derecha - 12, left, -12), left];
+        const posicionesY = [abajo, ...d3.range(abajo - 12, top, -12), top];
+        const marcas = [...marcasFicha];
+        const anillo = contenedor.querySelector(".punto-consultado");
+        if (anillo?.getAttribute("opacity") === "1") {
+          const x = +anillo.getAttribute("cx"), y = +anillo.getAttribute("cy"), r = +anillo.getAttribute("r") + 2;
+          marcas.push({ left: x - r, right: x + r, top: y - r, bottom: y + r, peso: 100 });
+        }
+        let mejor = { x: derecha, y: abajo, costo: Infinity };
+        for (const y of posicionesY) {
+          for (const x of posicionesX) {
+            const caja = { left: x, right: x + ancho, top: y, bottom: y + alto };
+            const costo = marcas.reduce((total, marca) => total + (seSuperponen(caja, marca) ? marca.peso : 0), 0);
+            if (costo < mejor.costo) mejor = { x, y, costo };
+            if (costo === 0) break;
+          }
+          if (mejor.costo === 0) break;
+        }
+        ficha.style.left = `${mejor.x}px`;
+        ficha.style.top = `${mejor.y}px`;
       }
       function actualizarFicha(d = null, contexto = "") {
         const clave = `${d?.iso3 ?? ""}|${contexto}`;
@@ -514,7 +541,7 @@
         titulo.textContent = d?.pais ?? "Explorá un país";
         const detalle = document.createElement("p");
         detalle.className = "t-contexto";
-        detalle.textContent = d ? `${d.region} · ${contexto}` : "Pasá por un punto o buscá un país.";
+        detalle.textContent = d ? [d.region, contexto].filter(Boolean).join(" · ") : "Pasá por un punto o buscá un país.";
         ficha.append(titulo, detalle);
         if (!d) { ubicarFicha(); return; }
         const dl = document.createElement("dl");
@@ -555,28 +582,31 @@
         {
           boton: "La regla",
           color: "--recta",
-          texto: `Entre las economías de 2024, el modelo estima ${fmt.coma((modelo.b * Math.LN2).toFixed(1))} años más de esperanza de vida por cada duplicación del PIB por habitante.`,
           activo: () => true,
         },
         {
           boton: "Por encima",
           color: "--mas-fuerte",
-          texto: "Se resaltan en azul los países que viven al menos 3 años más de lo que predice su ingreso: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
           activo: d => d.brecha >= 3,
           etiquetas: { JOR: "arriba", LKA: "izq", JPN: "der", CRI: "der", CHL: "arriba", BGD: "izq", ECU: "abajo" },
           movil: { JOR: "arriba", LKA: "izq", JPN: "izq", CRI: "izq" },
         },
         {
+          boton: "Cerca de lo esperado",
+          color: "--neutro",
+          activo: d => claseDe(d.brecha).token === "--neutro",
+          etiquetas: { ARG: "der", BRA: "abajo", DEU: "der", IND: "der", MMR: "izq" },
+          movil: { ARG: "der", IND: "der", MMR: "izq" },
+        },
+        {
           boton: "Por debajo",
           color: "--menos-fuerte",
-          texto: "Se resaltan en coral los países que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
           activo: d => d.brecha <= -2.95,
           etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
           movil: { NGA: "der", RUS: "izq", USA: "abajo" },
         },
       ];
       let paso = 0;
-      const textoPaso = document.getElementById("paso-texto");
       const botones = d3.select("#pasos").selectAll("button").data(PASOS).join("button")
         .attr("type", "button").text(p => p.boton)
         .style("--color-paso", p => `var(${p.color})`)
@@ -584,8 +614,6 @@
       function irAPaso(i) {
         paso = i;
         botones.attr("aria-pressed", (p, j) => j === paso);
-        textoPaso.textContent = paso === null ? "" : PASOS[paso].texto;
-        textoPaso.style.setProperty("--color-paso", paso === null ? "" : `var(${PASOS[paso].color})`);
         if (paso !== null) { seleccion = null; buscar.value = ""; region.value = ""; tip.ocultar(); }
         dibujar();
       }
@@ -594,11 +622,10 @@
 
       function dibujar() {
         const ancho = contenedor.clientWidth;
-        contenedor.classList.toggle("ficha-interior", ancho >= 900);
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
         const actual = paso === null ? null : PASOS[paso];
-        const m = { top: 28, right: 14, bottom: 46, left: 44 };
+        const m = { top: 24, right: 14, bottom: 46, left: 60 };
 
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
         const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
@@ -617,14 +644,13 @@
           .attr("x1", m.left).attr("x2", ancho - m.right).attr("y1", d => y(d)).attr("y2", d => y(d));
         svg.append("g").attr("class", "eje").attr("transform", `translate(0,${alto - m.bottom})`)
           .call(d3.axisBottom(x).tickValues(angosto ? [1000, 5000, 20000, 100000] : marcas)
-            .tickFormat(v => v >= 1000 ? (v / 1000) + " mil" : v).tickSizeOuter(0))
-          .call(g => g.select(".domain").remove());
+            .tickFormat(v => v >= 1000 ? (v / 1000) + " mil" : v).tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
-          .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
-          .call(g => g.select(".domain").remove());
+          .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
         svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje").attr("x", m.left).attr("y", 14)
+        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
+          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
           .text("Esperanza de vida (años)");
 
         const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
@@ -633,10 +659,10 @@
           .attr("stroke-width", paso === 0 ? 2.5 : 1.5).attr("opacity", paso === 0 ? 1 : .7);
 
         const filtro = region.value;
-        const activo = actual ? actual.activo
-          : d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
+        const visibles = filtro ? paises.filter(d => d.region === filtro) : paises;
+        const activo = actual ? actual.activo : d => !seleccion || d.iso3 === seleccion.iso3;
 
-        svg.append("g").selectAll("circle").data(paises).join("circle")
+        svg.append("g").selectAll("circle").data(visibles).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
           .attr("fill", colorBrecha)
           .attr("fill-opacity", d => activo(d) ? .88 : .12);
@@ -644,7 +670,7 @@
         const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
           : actual?.etiquetas ? Object.keys(posiciones).map(iso3 => paises.find(d => d.iso3 === iso3)).filter(Boolean)
-          : paises.filter(d => (filtro ? d.region === filtro && Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
+          : visibles.filter(d => (filtro ? Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
               .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
         const ocupadas = [];
         svg.append("g").selectAll("text").data(etiquetados).join("text")
@@ -672,22 +698,37 @@
             etiqueta.remove();
           });
 
-        const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("opacity", 0);
+        areaFicha = { left: m.left + 8, top: m.top + 8, right: ancho - m.right - 8, bottom: alto - m.bottom - 8 };
+        marcasFicha = visibles.map(d => {
+          const cx = x(d.pib), cy = y(d.vida), r = radio(d) + 1;
+          return { left: cx - r, right: cx + r, top: cy - r, bottom: cy + r, peso: r >= 3 ? 4 : 1 };
+        });
+        for (const etiqueta of svg.selectAll(".etiqueta").nodes()) {
+          const caja = etiqueta.getBBox();
+          marcasFicha.push({ left: caja.x - 2, right: caja.x + caja.width + 2, top: caja.y - 2, bottom: caja.y + caja.height + 2, peso: 20 });
+        }
+        const anillo = svg.append("circle").attr("class", "punto-consultado").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("opacity", 0);
 
-        const delaunay = d3.Delaunay.from(paises, d => x(d.pib), d => y(d.vida));
+        const delaunay = d3.Delaunay.from(visibles, d => x(d.pib), d => y(d.vida));
         const mostrar = (d) => {
           anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("r", Math.max(6.5, radio(d) + 3)).attr("opacity", 1);
-          actualizarFicha(d, seleccion?.iso3 === d.iso3 ? "País seleccionado" : seleccion ? `Consulta momentánea. Seleccionado: ${seleccion.pais}` : "País consultado");
+          actualizarFicha(d, seleccion && seleccion.iso3 !== d.iso3 ? `Consulta momentánea. Seleccionado: ${seleccion.pais}` : "");
         };
         const restaurarFicha = () => {
           if (seleccion) mostrar(seleccion);
-          else { tip.ocultar(); anillo.attr("opacity", 0); }
+          else { anillo.attr("opacity", 0); tip.ocultar(); }
         };
         svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
           .on("pointermove click", ev => {
             if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             const [px, py] = d3.pointer(ev);
-            const d = paises[delaunay.find(px, py)];
+            if (ev.type === "click" && filtro) {
+              const pulsado = visibles.findLast(d => Math.hypot(x(d.pib) - px, y(d.vida) - py) <= radio(d));
+              if (pulsado) mostrar(pulsado);
+              else { region.value = ""; cambiarRegion(); }
+              return;
+            }
+            const d = visibles[delaunay.find(px, py)];
             if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { restaurarFicha(); return; }
             mostrar(d);
           })
@@ -698,7 +739,7 @@
       }
 
       // Buscar o filtrar saca al lector del recorrido guiado y lo deja explorar libremente
-      const salirDelRecorrido = () => { paso = null; botones.attr("aria-pressed", false); textoPaso.textContent = ""; };
+      const salirDelRecorrido = () => { paso = null; botones.attr("aria-pressed", false); };
       buscar.addEventListener("input", () => {
         const texto = buscar.value.trim().toLowerCase();
         const anterior = seleccion;
@@ -707,7 +748,14 @@
         if (!texto || seleccion || anterior) dibujar();
         if (!seleccion) tip.ocultar();
       });
-      region.addEventListener("change", () => { seleccion = null; buscar.value = ""; tip.ocultar(); salirDelRecorrido(); dibujar(); });
+      function cambiarRegion() {
+        seleccion = null;
+        buscar.value = "";
+        tip.ocultar();
+        salirDelRecorrido();
+        dibujar();
+      }
+      region.addEventListener("change", cambiarRegion);
 
       irAPaso(0);
       redibujarAlCambiarAncho(contenedor, dibujar);
@@ -788,7 +836,7 @@
           .attr("x", d => x(d)).attr("y", m.top - 10).attr("text-anchor", "middle")
           .text(d => d === 0 ? "0" : fmt.signo(d).replace(",0", ""));
         svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.top - 6).attr("y2", alto - m.bottom)
-          .attr("stroke", "var(--eje)");
+          .attr("class", "eje-referencia");
         svg.append("g").selectAll("text").data(huecos.filter(h => h.cantidad > 0)).join("text")
           .attr("class", "valor-fila").attr("x", x(0) - 8).attr("y", h => yDe(h.en) - 4).attr("text-anchor", "end")
           .text(h => `… ${h.cantidad} ${h.cantidad === 1 ? "país" : "países"}`);
@@ -921,7 +969,7 @@
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
         const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
-        const m = { top: 28, right: angosto ? 16 : 24, bottom: 46, left: 44 };
+        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 60 };
 
         const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
         const todos = recorridos.flatMap(r => r.datos);
@@ -943,14 +991,14 @@
           .attr("x1", m.left).attr("x2", ancho - m.right).attr("y1", d => y(d)).attr("y2", d => y(d));
         const candidatos = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000].filter(v => v >= x.domain()[0] && v <= x.domain()[1]);
         svg.append("g").attr("class", "eje").attr("transform", `translate(0,${alto - m.bottom})`)
-          .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0))
-          .call(g => g.select(".domain").remove());
+          .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
-          .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
-          .call(g => g.select(".domain").remove());
+          .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
         svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje").attr("x", m.left).attr("y", 14).text("Esperanza de vida (años)");
+        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
+          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
+          .text("Esperanza de vida (años)");
 
         const plano = svg.append("g").attr("clip-path", null);
         const enRango = d => d.pib >= x.domain()[0] && d.pib <= x.domain()[1] && d.vida >= y.domain()[0] && d.vida <= y.domain()[1];
