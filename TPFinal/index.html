@@ -85,6 +85,32 @@
       --serie-3: #199e70;
     }
 
+    #fig-dispersion {
+      --mas-fuerte: #194b87;
+      --mas-suave: #397ba7;
+      --neutro: #8d782c;
+      --menos-suave: #b85a3e;
+      --menos-fuerte: #9a2935;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) #fig-dispersion {
+        --mas-fuerte: #91bfdb;
+        --mas-suave: #5585a3;
+        --neutro: #ded48f;
+        --menos-suave: #b36f59;
+        --menos-fuerte: #fc8d59;
+      }
+    }
+
+    :root[data-theme="dark"] #fig-dispersion {
+      --mas-fuerte: #91bfdb;
+      --mas-suave: #5585a3;
+      --neutro: #ded48f;
+      --menos-suave: #b36f59;
+      --menos-fuerte: #fc8d59;
+    }
+
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--pagina); color: var(--texto); font: 17px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
     .columna { max-width: 680px; margin: 0 auto; padding: 0 20px; }
@@ -213,7 +239,7 @@
     <figure class="ancho" id="fig-dispersion">
       <div class="tarjeta">
         <p class="grafico-titulo">Más ingreso, más años de vida… casi siempre</p>
-        <p class="grafico-sub">Cada círculo es un país, con tamaño proporcional a su población. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
+        <p class="grafico-sub">El área de cada círculo es proporcional a la población de la economía. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
         <div class="pasos" id="pasos" aria-label="Recorrido guiado por el gráfico"></div>
         <p class="paso-texto" id="paso-texto" aria-live="polite"></p>
         <div class="controles">
@@ -233,7 +259,7 @@
 
     <div class="columna">
       <p>La línea resume la regla general. En la parte baja de la escala, unos pocos miles de dólares adicionales por persona cambian mucho la expectativa de vida; en la parte alta, el efecto se achica. Por eso el eje está en escala logarítmica: así la relación se vuelve casi una recta, y cada duplicación del ingreso suma, en promedio, unos tres años y medio.</p>
-      <p>Los países en <strong>azul</strong> viven más de lo que predice su ingreso. Los países en <strong>rojo</strong>, menos.</p>
+      <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
 
       <h2>Los que se salen del patrón</h2>
       <p>Si se mide la distancia de cada país a esa línea aparece un ranking distinto del habitual. No es el de quién vive más, sino el de quién vive más (o menos) de lo que le correspondería por su nivel de ingreso.</p>
@@ -415,14 +441,14 @@
         },
         {
           boton: "2. Los que viven más",
-          texto: "En azul, los países que viven al menos 3 años más de lo que predice su ingreso. Los hay en todas las regiones: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
+          texto: "Se resaltan en azul los países que viven al menos 3 años más de lo que predice su ingreso: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
           activo: d => d.brecha >= 3,
           etiquetas: { JPN: "der", CRI: "der", CHL: "arriba", LKA: "izq", BGD: "izq", ECU: "abajo", JOR: "izq" },
           movil: { JPN: "izq", CRI: "izq", LKA: "izq" },
         },
         {
           boton: "3. Los que viven menos",
-          texto: "En rojo, los que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
+          texto: "Se resaltan en coral los países que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
           activo: d => d.brecha <= -2.95,
           etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
           movil: { NGA: "der", RUS: "izq", USA: "abajo" },
@@ -461,6 +487,7 @@
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
         const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
         const r = d3.scaleSqrt().domain([0, d3.max(paises, d => d.poblacion)]).range([0, angosto ? 22 : 34]);
+        const radio = d => r(d.poblacion);
 
         d3.select(contenedor).select("svg").remove();
         const svg = d3.select(contenedor).insert("svg", ".tooltip")
@@ -494,10 +521,9 @@
           : d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
 
         const puntos = svg.append("g").selectAll("circle").data(paises).join("circle")
-          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", d => Math.max(3.5, r(d.poblacion)))
+          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
           .attr("fill", d => `var(${claseDe(d.brecha).token})`)
-          .attr("fill-opacity", d => activo(d) ? .88 : .12)
-          .attr("stroke", "var(--superficie)").attr("stroke-width", 1.5);
+          .attr("fill-opacity", d => activo(d) ? .88 : .12);
 
         const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
@@ -508,7 +534,6 @@
           const preferido = posiciones[d.iso3] || "der";
           return preferido === "der" && x(d.pib) > ancho - m.right - 110 ? "izq" : preferido;
         };
-        const radio = d => Math.max(3.5, r(d.poblacion));
         svg.append("g").selectAll("text").data(etiquetados).join("text")
           .attr("class", "etiqueta")
           .attr("x", d => x(d.pib) + ({ der: radio(d) + 4, izq: -radio(d) - 4, arriba: 0, abajo: 0 })[lado(d)])
@@ -531,7 +556,7 @@
 
         const delaunay = d3.Delaunay.from(paises, d => x(d.pib), d => y(d.vida));
         const mostrar = (d) => {
-          anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("r", Math.max(3.5, r(d.poblacion)) + 3).attr("opacity", 1);
+          anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("r", Math.max(6.5, radio(d) + 3)).attr("opacity", 1);
           tip.mostrar([
             ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
             ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
