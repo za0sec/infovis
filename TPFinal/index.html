@@ -198,11 +198,13 @@
     .tooltip dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
-    .nombre-fila { fill: var(--texto); font-size: 13px; }
-    .nombre-fila.argentina { font-weight: 700; }
-    .fila-argentina path { fill: var(--neutro); }
-    .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
-    .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
+    .leyenda-regiones .punto-negativo { background: var(--menos-fuerte); }
+    .leyenda-regiones .punto-positivo { background: var(--mas-fuerte); }
+    .leyenda-regiones .marca-mediana { width: 2px; height: 12px; border-radius: 0; background: var(--texto); }
+    .region-nombre { fill: var(--texto); font-size: 13px; font-weight: 600; }
+    .region-resumen { fill: var(--texto-2); font-size: 12px; }
+    .region-punto { cursor: pointer; }
+    .region-punto:focus { outline: none; stroke: var(--texto); stroke-width: 2px; }
 
     .resumen { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 6px 0 0; padding: 0; list-style: none; color: var(--texto-2); font-size: 14px; }
     .resumen li { display: flex; gap: 8px; align-items: baseline; }
@@ -283,36 +285,40 @@
       <p>La línea resume la regla general. En la parte baja de la escala, unos pocos miles de dólares adicionales por persona cambian mucho la expectativa de vida; en la parte alta, el efecto se achica. Por eso el eje está en escala logarítmica: así la relación se vuelve casi una recta, y cada duplicación del ingreso suma, en promedio, unos tres años y medio.</p>
       <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
 
-      <h2>Los que se salen del patrón</h2>
-      <p>El ejemplo de Costa Rica muestra cómo se mide la brecha. Si ordenamos a los países por esa distancia, ¿quiénes quedan más por encima o por debajo de la línea y por cuántos años?</p>
+      <h2>Las brechas por región</h2>
+      <p>La brecha es la distancia vertical entre cada punto y la línea. Al reunir esas diferencias por región podemos ver si los casos de la dispersión son excepcionales o si muchos de sus vecinos se apartan en la misma dirección.</p>
     </div>
 
-    <figure class="ancho" id="fig-ranking">
+    <figure class="ancho" id="fig-regiones">
       <div class="tarjeta">
-        <p class="grafico-titulo">¿Cuántos años de más o de menos vive cada país?</p>
-        <p class="grafico-sub">Diferencia entre la esperanza de vida real y la que predice su ingreso por habitante, en años. Los 12 países más por encima y los 12 más por debajo de lo esperado.</p>
+        <p class="grafico-titulo">¿Cómo se distribuyen las brechas por región?</p>
+        <p class="grafico-sub">Cada punto es una economía. A la izquierda del cero quedan las que viven menos de lo que estima el modelo, y a la derecha las que viven más.</p>
         <div class="controles">
-          <label>Región
-            <select id="region-ranking">
+          <label>Región del Banco Mundial
+            <select id="region-brechas">
               <option value="">Todas</option>
             </select>
           </label>
-          <label><input type="checkbox" id="chicos"> Incluir países de menos de 1 millón de habitantes</label>
+          <label><input type="checkbox" id="chicos" checked> Incluir economías de menos de 1 millón de habitantes</label>
         </div>
-        <div class="lienzo" id="ranking"><div class="tooltip" role="status"></div></div>
-        <p class="nota-grafico" id="nota-argentina"></p>
+        <div class="leyenda leyenda-regiones">
+          <span><i class="punto-negativo"></i> Por debajo</span>
+          <span><i class="punto-positivo"></i> Por encima</span>
+          <span><i class="marca-mediana"></i> Mediana regional</span>
+        </div>
+        <div class="lienzo" id="brechas-regionales"><div class="tooltip" role="status"></div></div>
         <details class="tabla">
-          <summary>Ver todos los países en una tabla</summary>
+          <summary>Ver el ranking mundial completo</summary>
           <div class="tabla-scroll"><table id="tabla"></table></div>
         </details>
       </div>
-      <figcaption>Brecha calculada respecto de una regresión de la esperanza de vida sobre el logaritmo del PIB per cápita PPA, 2024 (195 países). Por defecto se excluyen los países de menos de un millón de habitantes, cuyas estimaciones son más inestables. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
+      <figcaption>Brecha calculada respecto de una regresión de la esperanza de vida sobre el logaritmo del PIB per cápita PPA, 2024 (195 países). La mediana es el valor central de las brechas de cada región y cada economía cuenta por igual. Los puntos se separan verticalmente para que se puedan distinguir. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
-      <p>Arriba del ranking conviven realidades muy distintas. Entre las economías de ingreso alto, <strong>Kuwait</strong> tiene la mayor brecha positiva: su esperanza de vida supera en 5,2 años lo que estima el modelo. Le sigue <strong>Japón</strong>, con 4,6 años por encima. También se destacan países de ingreso medio como <strong>Sri Lanka</strong>, <strong>Marruecos</strong> y <strong>Jordania</strong>. En América Latina, <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más.</p>
-      <p>Abajo, el patrón es más uniforme. Casi todo el fondo de la tabla es África subsahariana, donde se combinan dos historias: países con alta prevalencia de VIH, como <strong>Sudáfrica</strong>, <strong>Esuatini</strong> o <strong>Lesoto</strong>, y economías petroleras, como <strong>Nigeria</strong>, <strong>Guinea Ecuatorial</strong>, <strong>Gabón</strong> o <strong>Angola</strong>, donde el ingreso promedio es relativamente alto pero no llega a traducirse en salud. Nigeria, el país más poblado de África, vive 15 años menos de lo que su ingreso haría esperar.</p>
-      <p>El único país fuera de África entre los doce peores es <strong>Rusia</strong>, y su déficit tiene un sesgo muy marcado. Las rusas viven 2,6 años menos de lo que predice el ingreso del país; los rusos, 7,9 años menos. La diferencia entre mujeres y varones, de 10,6 años, es la más grande del mundo, y se repite en otras ex repúblicas soviéticas como Letonia, Bielorrusia o Ucrania.</p>
+      <p>En <strong>África subsahariana</strong>, 29 de las 46 economías están por debajo de lo esperado y la mediana es de −2,3 años. <strong>Nigeria</strong> queda en el extremo, con una brecha de −15,4 años. La región también incluye casos por encima de la línea, como <strong>Malaui</strong> (+5,8 años).</p>
+      <p>En <strong>América Latina y el Caribe</strong>, la mediana queda cerca de cero (+0,3 años). <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más. Entre las economías de ingreso alto, las mayores brechas positivas son las de <strong>Kuwait</strong> (+5,2) y <strong>Japón</strong> (+4,6).</p>
+      <p><strong>Rusia</strong> queda 5,3 años por debajo de lo esperado. Al ajustar un modelo para cada sexo, la brecha es de −2,6 años entre las mujeres y de −7,9 entre los varones.</p>
       <p>Pero entre los países ricos, el caso más llamativo tal vez sea otro.</p>
 
       <h2>Más dinero no compra más años</h2>
@@ -430,7 +436,7 @@
       document.querySelector('[data-cifra="n-mortalidad"]').textContent = modelo.paises_muestra_mortalidad;
       document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
       dispersion(paises, modelo);
-      ranking(paises);
+      brechasRegionales(paises);
       tabla(paises);
       d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
     });
@@ -457,7 +463,6 @@
       leyenda.append("span").call(s => s.append("i").attr("class", "linea"))
         .call(s => s.append("span").text("Esperada según el ingreso"));
 
-      const costaRica = paises.find(d => d.iso3 === "CRI");
       const PASOS = [
         {
           boton: "La regla",
@@ -466,11 +471,20 @@
           activo: () => true,
         },
         {
-          boton: "Cómo se mide la brecha",
+          boton: "Por encima",
           color: "--mas-fuerte",
-          texto: `Al PIB por habitante de Costa Rica, la línea marca ${fmt.coma(fmt.anios(costaRica.esperada))} años. El punto observado está en ${fmt.coma(fmt.anios(costaRica.vida))}. La distancia vertical entre ambos es la brecha: ${fmt.signo(costaRica.brecha)} años.`,
-          activo: d => d === costaRica,
-          ejemplo: costaRica,
+          texto: "Se resaltan en azul los países que viven al menos 3 años más de lo que predice su ingreso: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
+          activo: d => d.brecha >= 3,
+          etiquetas: { JOR: "arriba", LKA: "izq", JPN: "der", CRI: "der", CHL: "arriba", BGD: "izq", ECU: "abajo" },
+          movil: { JOR: "arriba", LKA: "izq", JPN: "izq", CRI: "izq" },
+        },
+        {
+          boton: "Por debajo",
+          color: "--menos-fuerte",
+          texto: "Se resaltan en coral los países que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
+          activo: d => d.brecha <= -2.95,
+          etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
+          movil: { NGA: "der", RUS: "izq", USA: "abajo" },
         },
       ];
       let paso = 0;
@@ -533,28 +547,14 @@
         const activo = actual ? actual.activo
           : d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
 
-        if (actual?.ejemplo) {
-          const d = actual.ejemplo;
-          const cx = x(d.pib);
-          const observada = y(d.vida);
-          const esperada = y(modelo.a + modelo.b * Math.log(d.pib));
-          const marca = svg.append("g").attr("class", "marca-brecha");
-          marca.append("path")
-            .attr("d", `M${cx},${observada}V${esperada}m-4,0h8`)
-            .attr("fill", "none").attr("stroke", "var(--mas-fuerte)").attr("stroke-width", 2);
-          marca.append("text").attr("class", "etiqueta")
-            .attr("x", cx + 8).attr("y", (observada + esperada) / 2 + 4)
-            .text(`${fmt.signo(d.brecha)} años`);
-        }
-
         svg.append("g").selectAll("circle").data(paises).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
           .attr("fill", d => `var(${claseDe(d.brecha).token})`)
           .attr("fill-opacity", d => activo(d) ? .88 : .12);
 
-        const posiciones = actual?.ejemplo ? { CRI: "izq" } : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
+        const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
-          : actual?.ejemplo ? [actual.ejemplo]
+          : actual?.etiquetas ? Object.keys(posiciones).map(iso3 => paises.find(d => d.iso3 === iso3)).filter(Boolean)
           : paises.filter(d => (filtro ? d.region === filtro && Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
               .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
         const ocupadas = [];
@@ -626,107 +626,91 @@
       irAPaso(0);
       redibujarAlCambiarAncho(contenedor, dibujar);
     }
-    function ranking(paises) {
-      const contenedor = document.getElementById("ranking");
-      const tip = tooltip(contenedor);
-      const region = document.getElementById("region-ranking");
+    function brechasRegionales(paises) {
+      const contenedor = document.getElementById("brechas-regionales");
+      const region = document.getElementById("region-brechas");
       const chicos = document.getElementById("chicos");
-      const N = 12;
+      const tip = tooltip(contenedor);
+      const dominio = d3.extent(paises, d => d.brecha);
 
       d3.select(region).selectAll("option.r").data([...new Set(paises.map(d => d.region))].sort(d3.ascending))
         .join("option").attr("class", "r").attr("value", d => d).text(d => d);
 
-      function filas() {
-        const universo = paises.filter(d => (chicos.checked || d.poblacion >= 1e6) && (!region.value || d.region === region.value))
-          .sort((a, b) => b.brecha - a.brecha);
-        if (universo.length <= N * 2) return { universo, recorte: universo, huecos: [] };
-        // Argentina queda fija en el medio cuando no está entre los extremos, como referencia para el lector
-        const iArg = universo.findIndex(d => d.iso3 === "ARG");
-        const intermedios = universo.length - N * 2;
-        if (iArg >= N && iArg < universo.length - N) {
-          return {
-            universo,
-            recorte: [...universo.slice(0, N), universo[iArg], ...universo.slice(-N)],
-            huecos: [{ en: N, cantidad: iArg - N }, { en: N + 1, cantidad: intermedios - (iArg - N) - 1 }],
-          };
-        }
-        return { universo, recorte: [...universo.slice(0, N), ...universo.slice(-N)], huecos: [{ en: N, cantidad: intermedios }] };
-      }
-
-      function nota(universo) {
-        const el = document.getElementById("nota-argentina");
-        const i = universo.findIndex(d => d.iso3 === "ARG");
-        if (i < 0) { el.textContent = ""; return; }
-        const arg = universo[i];
-        el.textContent = `Argentina (destacada en el medio): ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length}. Prácticamente sobre la línea.`;
-      }
-
       function dibujar() {
-        const { universo, recorte, huecos } = filas();
-        nota(universo);
+        tip.ocultar();
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
-        const fila = 24, hueco = 18;
-        const m = { top: 24, right: angosto ? 36 : 44, bottom: 8, left: angosto ? 100 : 170 };
-        const alto = m.top + m.bottom + recorte.length * fila + huecos.length * hueco;
-        const yDe = i => m.top + i * fila + hueco * huecos.filter(h => i >= h.en).length;
+        const x = d3.scaleLinear().domain(dominio).nice().range([18, ancho - 18]);
+        const elegibles = paises.filter(d => (chicos.checked || d.poblacion >= 1e6) && (!region.value || d.region === region.value));
+        let alto = 27;
+        const grupos = Array.from(d3.group(elegibles, d => d.region), ([nombre, datos]) => ({
+          nombre, datos, mediana: d3.median(datos, d => d.brecha),
+        })).sort((a, b) => b.mediana - a.mediana);
 
-        const x = d3.scaleLinear()
-          .domain([Math.min(-2, d3.min(recorte, d => d.brecha)), Math.max(2, d3.max(recorte, d => d.brecha))])
-          .range([m.left + (angosto ? 34 : 44), ancho - m.right]).nice();
+        for (const grupo of grupos) {
+          const carriles = [];
+          grupo.puntos = [...grupo.datos].sort((a, b) => a.brecha - b.brecha).map(d => {
+            const cx = x(d.brecha);
+            const libre = carriles.findIndex(ultimo => cx - ultimo >= 11);
+            const carril = libre === -1 ? carriles.length : libre;
+            carriles[carril] = cx;
+            return { d, cx, carril };
+          });
+          grupo.lineas = angosto && grupo.nombre.startsWith("Medio Oriente")
+            ? ["Medio Oriente, norte de África,", "Afganistán y Pakistán"]
+            : [grupo.nombre];
+          const extra = (grupo.lineas.length - 1) * 16;
+          grupo.titulo = alto + 15;
+          grupo.centro = alto + 55 + extra;
+          grupo.carriles = carriles.length;
+          alto += 61 + extra + (carriles.length - 1) * 11;
+        }
 
         d3.select(contenedor).select("svg").remove();
         const svg = d3.select(contenedor).insert("svg", ".tooltip")
           .attr("viewBox", `0 0 ${ancho} ${alto}`)
-          .attr("role", "img")
-          .attr("aria-label", "Ranking de países según cuántos años viven por encima o por debajo de lo esperado por su ingreso");
-
-        svg.append("g").attr("class", "grilla")
-          .selectAll("line").data(x.ticks(angosto ? 3 : 8)).join("line")
-          .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", m.top - 6).attr("y2", alto - m.bottom);
+          .attr("role", "group")
+          .attr("aria-label", "Brecha de esperanza de vida por región, en años");
+        const marcas = x.ticks(angosto ? 4 : 8);
         svg.append("g").attr("class", "eje")
-          .selectAll("text").data(x.ticks(angosto ? 3 : 8)).join("text")
-          .attr("x", d => x(d)).attr("y", m.top - 10).attr("text-anchor", "middle")
-          .text(d => d === 0 ? "0" : fmt.signo(d).replace(",0", ""));
-        svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.top - 6).attr("y2", alto - m.bottom)
-          .attr("stroke", "var(--eje)");
-        svg.append("g").selectAll("text").data(huecos.filter(h => h.cantidad > 0)).join("text")
-          .attr("class", "valor-fila").attr("x", x(0) - 8).attr("y", h => yDe(h.en) - 4).attr("text-anchor", "end")
-          .text(h => `… ${h.cantidad} ${h.cantidad === 1 ? "país" : "países"}`);
+          .attr("transform", "translate(0, 20)")
+          .call(d3.axisTop(x).tickValues(marcas).tickFormat(d => d === 0 ? "0" : fmt.signo(d).replace(",0", "")).tickSize(0))
+          .call(g => g.select(".domain").remove());
 
-        const alto_barra = 14;
-        const barra = (d, i) => {
-          const y0 = yDe(i) + (fila - alto_barra) / 2, x0 = x(0), x1 = x(d.brecha), r = Math.min(4, Math.abs(x1 - x0));
-          const s = Math.sign(x1 - x0) || 1;
-          return `M${x0},${y0}H${x1 - s * r}Q${x1},${y0} ${x1},${y0 + r}V${y0 + alto_barra - r}Q${x1},${y0 + alto_barra} ${x1 - s * r},${y0 + alto_barra}H${x0}Z`;
-        };
-        const color = d => d.brecha >= 0 ? "var(--mas-fuerte)" : "var(--menos-fuerte)";
-
-        const g = svg.append("g").selectAll("g").data(recorte).join("g").attr("class", d => d.iso3 === "ARG" ? "fila-argentina" : null);
-        g.append("path").attr("d", barra).attr("fill", color);
-        g.append("text").attr("class", d => "nombre-fila" + (d.iso3 === "ARG" ? " argentina" : ""))
-          .attr("x", m.left - 8).attr("y", (d, i) => yDe(i) + fila / 2 + 4).attr("text-anchor", "end")
-          .text(d => d.pais.length > 14 && angosto ? d.pais.slice(0, 13) + "…" : d.pais);
-        g.append("text").attr("class", "valor-fila")
-          .attr("x", d => x(d.brecha) + (d.brecha >= 0 ? 5 : -5)).attr("y", (d, i) => yDe(i) + fila / 2 + 4)
-          .attr("text-anchor", d => d.brecha >= 0 ? "start" : "end")
-          .text(d => fmt.signo(d.brecha));
-        g.append("rect").attr("x", 0).attr("width", ancho).attr("y", (d, i) => yDe(i)).attr("height", fila)
-          .attr("fill", "transparent").attr("tabindex", 0)
-          .on("pointerenter focus", function (ev, d) {
-            d3.select(this.parentNode).select("path").attr("opacity", .75);
-            const i = recorte.indexOf(d);
+        const filas = svg.selectAll("g.region-fila").data(grupos).join("g").attr("class", "region-fila");
+        filas.append("text").attr("class", "region-nombre")
+          .attr("x", 2).attr("y", g => g.titulo)
+          .selectAll("tspan").data(g => g.lineas).join("tspan")
+          .attr("x", 2).attr("dy", (texto, i) => i ? 16 : 0).text(texto => texto);
+        filas.append("text").attr("class", "region-resumen").attr("x", 2)
+          .attr("y", g => g.centro - 23)
+          .text(g => `${g.datos.length} economías · mediana ${fmt.signo(g.mediana)} años`);
+        filas.append("line")
+          .attr("x1", x.range()[0]).attr("x2", x.range()[1])
+          .attr("y1", g => g.centro).attr("y2", g => g.centro)
+          .attr("stroke", "var(--grilla)");
+        filas.append("line")
+          .attr("x1", x(0)).attr("x2", x(0))
+          .attr("y1", g => g.centro - 10).attr("y2", g => g.centro + (g.carriles - 1) * 11 + 6)
+          .attr("stroke", "var(--texto-3)");
+        filas.append("line").attr("class", "region-mediana")
+          .attr("x1", g => x(g.mediana)).attr("x2", g => x(g.mediana))
+          .attr("y1", g => g.centro - 17).attr("y2", g => g.centro - 7)
+          .attr("stroke", "var(--texto)").attr("stroke-width", 2);
+        filas.selectAll("circle").data(g => g.puntos.map(p => ({ ...p, cy: g.centro + p.carril * 11 })))
+          .join("circle").attr("class", "region-punto")
+          .attr("cx", p => p.cx).attr("cy", p => p.cy).attr("r", 4.5)
+          .attr("fill", ({ d }) => d.brecha >= 0 ? "var(--mas-fuerte)" : "var(--menos-fuerte)")
+          .attr("tabindex", 0).attr("role", "img")
+          .attr("aria-label", ({ d }) => `${d.pais}, brecha de ${fmt.signo(d.brecha)} años`)
+          .on("pointerenter focus click", (ev, { d, cx, cy }) => {
             tip.mostrar([
-              ["Diferencia", fmt.signo(d.brecha) + " años"],
+              ["Brecha", fmt.signo(d.brecha) + " años"],
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-              ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
-              ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
-              ["PIB por habitante", fmt.dinero(d.pib)],
-              ["Gasto en salud por hab.", d.gasto_salud ? fmt.dinero(d.gasto_salud) + ` (${d.anio_gasto})` : "s/d"],
-              ["Mortalidad < 5 años", d.mortalidad_5 != null ? fmt.coma(d.mortalidad_5) + " ‰" : "s/d"],
-            ], d.pais, d.region, x(d.brecha), yDe(i));
+              ["Estimada por el modelo", fmt.coma(fmt.anios(d.esperada)) + " años"],
+            ], d.pais, d.region, cx, cy);
           })
-          .on("pointerleave blur", function () { d3.select(this.parentNode).select("path").attr("opacity", 1); tip.ocultar(); });
+          .on("pointerleave blur", () => tip.ocultar());
       }
 
       region.addEventListener("change", dibujar);
