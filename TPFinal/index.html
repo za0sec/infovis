@@ -8,7 +8,7 @@
   <meta name="author" content="Javier Peral Belmont, Pilar Frutos">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Vivir más sin ser más rico">
-  <meta property="og:description" content="El ingreso explica tres cuartas partes de las diferencias de esperanza de vida entre países. Esta nota trata sobre el resto.">
+  <meta property="og:description" content="¿Qué países tienen una esperanza de vida mayor o menor que la estimada según su PIB por habitante?">
   <meta property="og:url" content="https://za0sec.github.io/infovis/TPFinal/">
   <meta property="og:locale" content="es_AR">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='9' cy='22' r='5' fill='%23d03b3b'/%3E%3Ccircle cx='21' cy='10' r='7' fill='%23256abf'/%3E%3C/svg%3E">
@@ -241,17 +241,17 @@
   <header class="columna">
     <p class="volanta">Salud y desarrollo · Datos del Banco Mundial</p>
     <h1>Vivir más sin ser más rico</h1>
-    <p class="bajada">En casi todo el mundo, más ingreso significa más años de vida. Pero algunos países rompen la regla: viven como países ricos sin serlo, o mueren antes de lo que su riqueza haría esperar.</p>
+    <p class="bajada">Los países con mayor PIB por habitante suelen tener una esperanza de vida más alta. Algunos se apartan de ese patrón y viven más o menos de lo que estima el modelo.</p>
     <p class="firma"><span class="autores">Por <strong>Javier Peral Belmont</strong> y <strong>Pilar Frutos</strong></span> · Trabajo Práctico Final · Visualización de la Información · ITBA · Noviembre de 2026</p>
   </header>
 
   <article>
     <div class="columna">
-      <p>Un bebé que nace hoy en Japón puede esperar vivir 84 años. Uno que nace en Nigeria, 55. Casi 30 años de diferencia que, en buena medida, se explican por algo bastante obvio: el dinero. Los países con más ingreso por habitante tienen mejor alimentación, agua potable, hospitales y medicamentos.</p>
-      <p>La relación es tan fuerte que permite hacer una predicción. Si uno conoce el ingreso promedio de un país, puede estimar con bastante precisión cuánto vive su población. Lo interesante es cuando la predicción falla.</p>
+      <p>En 2024, la esperanza de vida al nacer era de 84 años en Japón y de 55 en Nigeria. ¿Cuánto ayuda el PIB por habitante a describir diferencias como esta?</p>
+      <p>El modelo da una referencia para comparar países. La brecha indica cuántos años separan la esperanza de vida observada de la estimada para el PIB por habitante de cada país.</p>
 
       <div class="cifras" id="cifras">
-        <div class="cifra"><b data-cifra="duplicar">+3,6 años</b><span>de esperanza de vida, en promedio, cada vez que se duplica el ingreso por habitante</span></div>
+        <div class="cifra"><b data-cifra="duplicar">+3,6 años</b><span>de esperanza de vida estimada por cada duplicación del PIB por habitante en la comparación de 2024</span></div>
         <div class="cifra"><b data-cifra="r2">74,4 %</b><span>de la variación en esperanza de vida que recoge el modelo con PIB per cápita en 195 economías</span></div>
         <div class="cifra"><b>2,1 años</b><span>más vive Costa Rica que Estados Unidos, con un tercio de su ingreso</span></div>
       </div>
@@ -279,7 +279,7 @@
     </figure>
 
     <div class="columna">
-      <p>La línea resume la regla general. En la parte baja de la escala, unos pocos miles de dólares adicionales por persona cambian mucho la expectativa de vida; en la parte alta, el efecto se achica. Por eso el eje está en escala logarítmica: así la relación se vuelve casi una recta, y cada duplicación del ingreso suma, en promedio, unos tres años y medio.</p>
+      <p>La línea resume el patrón de 2024. El eje horizontal es logarítmico, así que cada duplicación del PIB por habitante ocupa la misma distancia. A lo largo de la línea, esa distancia equivale a unos 3,6 años más de esperanza de vida estimada.</p>
       <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
 
       <h2>Los que se salen del patrón</h2>
@@ -311,12 +311,12 @@
 
     <div class="columna">
       <p>Arriba del ranking conviven realidades muy distintas. Entre las economías de ingreso alto, <strong>Kuwait</strong> tiene la mayor brecha positiva: su esperanza de vida supera en 5,2 años lo que estima el modelo. Le sigue <strong>Japón</strong>, con 4,6 años por encima. También se destacan países de ingreso medio como <strong>Sri Lanka</strong>, <strong>Marruecos</strong> y <strong>Jordania</strong>. En América Latina, <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más.</p>
-      <p>Abajo, el patrón es más uniforme. Casi todo el fondo de la tabla es África subsahariana, donde se combinan dos historias: países con alta prevalencia de VIH, como <strong>Sudáfrica</strong>, <strong>Esuatini</strong> o <strong>Lesoto</strong>, y economías petroleras, como <strong>Nigeria</strong>, <strong>Guinea Ecuatorial</strong>, <strong>Gabón</strong> o <strong>Angola</strong>, donde el ingreso promedio es relativamente alto pero no llega a traducirse en salud. Nigeria, el país más poblado de África, vive 15 años menos de lo que su ingreso haría esperar.</p>
-      <p>El único país fuera de África entre los doce peores es <strong>Rusia</strong>, y su déficit tiene un sesgo muy marcado. Las rusas viven 2,6 años menos de lo que predice el ingreso del país; los rusos, 7,9 años menos. La diferencia entre mujeres y varones, de 10,6 años, es la más grande del mundo, y se repite en otras ex repúblicas soviéticas como Letonia, Bielorrusia o Ucrania.</p>
+      <p>Entre los países de al menos un millón de habitantes, 11 de las 12 brechas más bajas corresponden a África subsahariana. <strong>Nigeria</strong> queda 15,4 años por debajo de lo que estima el modelo, seguida por <strong>Guinea Ecuatorial</strong> y <strong>Chad</strong>.</p>
+      <p>El único país fuera de África entre esas doce brechas es <strong>Rusia</strong>, y su déficit tiene un sesgo muy marcado. Las rusas viven 2,6 años menos de lo que predice el ingreso del país; los rusos, 7,9 años menos. La diferencia entre mujeres y varones, de 10,6 años, es la más grande del mundo, y se repite en otras ex repúblicas soviéticas como Letonia, Bielorrusia o Ucrania.</p>
       <p>Pero entre los países ricos, el caso más llamativo tal vez sea otro.</p>
 
-      <h2>Más dinero no compra más años</h2>
-      <p>En 2023, <strong>Estados Unidos</strong> gastó 13.473 dólares internacionales corrientes por habitante en salud y <strong>Costa Rica</strong>, 1.928. En paridad de poder adquisitivo, el gasto por habitante de Estados Unidos fue unas siete veces el de Costa Rica. Sin embargo, un costarricense vive en promedio dos años más que un estadounidense. Con su nivel de ingreso, Estados Unidos «debería» tener una esperanza de vida de 82 años; tiene 79.</p>
+      <h2>¿Cómo se comparan Estados Unidos y Costa Rica?</h2>
+      <p>En 2023, <strong>Estados Unidos</strong> gastó 13.473 dólares internacionales corrientes por habitante en salud y <strong>Costa Rica</strong>, 1.928. En paridad de poder adquisitivo, el gasto por habitante de Estados Unidos fue unas siete veces el de Costa Rica. En 2024, la esperanza de vida en Costa Rica superó en 2,1 años a la de Estados Unidos. Para Estados Unidos, el modelo estima 81,9 años frente a los 78,9 observados.</p>
       <p>La diferencia no apareció de un día para el otro. Si se sigue el recorrido de cada país desde 1990, se ve que el ingreso estadounidense siguió creciendo mientras su esperanza de vida se estancaba. Otros países, con mucho menos, avanzaron más rápido.</p>
     </div>
 
@@ -334,13 +334,13 @@
     </figure>
 
     <div class="columna">
-      <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. El pozo que se ve en casi todas las trayectorias en 2020 y 2021 es la pandemia de COVID-19, de la que la mayoría de los países ya se recuperó.</p>
+      <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. Estados Unidos, Costa Rica y Chile muestran una caída en la esperanza de vida entre 2019 y 2021, durante la pandemia. En los tres, la esperanza de vida de 2024 vuelve a alcanzar o superar el nivel de 2019.</p>
       <p>El botón «China e India» permite comparar dos ritmos de crecimiento. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. Con los selectores podés explorar otros casos. En 2024, <strong>Polonia</strong> y <strong>Rusia</strong> tenían un ingreso por habitante parecido y la esperanza de vida en Polonia era cinco años mayor. El PIB por habitante de <strong>Gabón</strong> era menor que en 1990.</p>
       <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
 
       <h2>Lo que dicen (y lo que no) estos datos</h2>
-      <p>El ingreso importa, y mucho: explica tres cuartas partes de las diferencias de esperanza de vida entre países. Pero el cuarto restante no es ruido. Hay países que, con recursos limitados, logran que su población viva como la de países que duplican o triplican su ingreso. Y hay otros donde la riqueza promedio no llega a la salud de la mayoría.</p>
-      <p>Los datos permiten encontrar esos casos, pero no explican por sí solos por qué ocurren. Detrás de cada brecha hay historias que exceden a un gráfico: la cobertura de la atención primaria, la desigualdad, las epidemias, la violencia, la dieta, el peso del petróleo en la economía. Lo que sí muestran con claridad es que <strong>vivir más no depende solo de ser más rico</strong>.</p>
+      <p>El modelo basado en el PIB por habitante capta cerca de tres cuartas partes de la variación observada en la esperanza de vida de las economías de 2024. Las brechas muestran dónde y cuánto se aparta cada país de ese patrón.</p>
+      <p>La atención primaria, la desigualdad y el peso del petróleo en la economía son posibles líneas de investigación para entender algunos casos. Para estimar cuánto aporta cada factor harían falta datos y análisis adicionales.</p>
 
       <h2 id="metodologia">Cómo lo hicimos</h2>
       <p>Todos los datos provienen de la <a href="https://data360.worldbank.org/en/api">API de Data360</a> del Banco Mundial, de la base <em>World Development Indicators</em>:</p>
@@ -351,7 +351,7 @@
         <li>Gasto corriente en salud per cápita en PPA, dólares internacionales corrientes (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
         <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
       </ul>
-      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no depende de esa elección: con una curva cuadrática o con una regresión ponderada por población, las brechas casi no cambian (correlación mayor a 0,99). Tampoco es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
+      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. La raíz del error cuadrático medio del ajuste es de 3,6 años en esa muestra, una medida del tamaño de las diferencias entre los valores observados y los estimados. Las brechas tienen una correlación superior a 0,99 con las de los modelos alternativos, aunque algunos puestos del ranking cambian. Muchas de estas diferencias ya se observaban en 2019. Las brechas de 2019 y 2024 tienen una correlación de 0,86.</p>
       <p>Entre las <span data-cifra="n-mortalidad">186</span> economías con datos completos, el modelo basado en el PIB per cápita da cuenta del <span data-cifra="r2-pib-muestra-mortalidad">73,4 %</span> de la variación observada en la esperanza de vida. Al incorporar la mortalidad de menores de 5 años, la proporción sube al <span data-cifra="r2-mortalidad">84,5 %</span>. Parte de esa mejora refleja que la esperanza de vida al nacer ya incorpora la mortalidad en esas edades. La comparación mide el ajuste dentro de la muestra y no permite estimar un efecto causal.</p>
       <p>Las brechas por sexo se calcularon con el mismo método, usando la esperanza de vida de mujeres y de varones.</p>
       <p>Hay que tener en cuenta algunas limitaciones. La esperanza de vida anual es una estimación de Naciones Unidas que se interpola a partir de datos quinquenales. Quedan afuera los países sin PIB en PPA reciente, como Cuba, Venezuela, Siria o Yemen. Y una correlación entre ingreso y salud no indica, por sí sola, en qué dirección va la causa.</p>
