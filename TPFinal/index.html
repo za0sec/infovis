@@ -299,6 +299,10 @@
       <p>La línea resume el patrón de 2024. El eje horizontal es logarítmico, así que cada duplicación del PIB por habitante ocupa la misma distancia. A lo largo de la línea, esa distancia equivale a unos 3,6 años más de esperanza de vida estimada.</p>
       <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
 
+    </div>
+
+    <!-- Ranking, trayectorias y su texto
+    <div class="columna">
       <h2>Los que se salen del patrón</h2>
       <p>Si se mide la distancia de cada país a esa línea aparece un ranking distinto del habitual. No es el de quién vive más, sino el de quién vive más (o menos) de lo que le correspondería por su nivel de ingreso.</p>
     </div>
@@ -356,6 +360,10 @@
       <p>El botón «China e India» permite comparar dos ritmos de crecimiento. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. Con los selectores podés explorar otros casos. En 2024, <strong>Polonia</strong> y <strong>Rusia</strong> tenían un ingreso por habitante parecido y la esperanza de vida en Polonia era cinco años mayor. El PIB por habitante de <strong>Gabón</strong> era menor que en 1990.</p>
       <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
 
+    </div>
+    -->
+
+    <div class="columna">
       <h2>Lo que dicen (y lo que no) estos datos</h2>
       <p>El modelo basado en el PIB por habitante capta cerca de tres cuartas partes de la variación observada en la esperanza de vida de las economías de 2024. Las brechas muestran dónde y cuánto se aparta cada país de ese patrón.</p>
       <p>La atención primaria, la desigualdad y el peso del petróleo en la economía son posibles líneas de investigación para entender algunos casos. Para estimar cuánto aporta cada factor harían falta datos y análisis adicionales.</p>
@@ -484,16 +492,15 @@
       document.querySelector('[data-cifra="n-mortalidad"]').textContent = modelo.paises_muestra_mortalidad;
       document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
       dispersion(paises, modelo);
-      ranking(paises);
-      d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
+      // ranking(paises);
+      // d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
     });
 
     function dispersion(paises, modelo) {
       const contenedor = document.getElementById("dispersion");
       const ficha = contenedor.querySelector(".ficha-pais");
       let ultimaFicha = null;
-      let areaFicha, marcasFicha = [];
-      const seSuperponen = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      let areaFicha;
       function ubicarFicha() {
         if (!areaFicha) return;
         const estrecho = contenedor.clientWidth < 500;
@@ -508,28 +515,8 @@
         contenedor.style.paddingTop = "";
         const { left, top, right, bottom } = areaFicha;
         ficha.style.maxWidth = `${right - left}px`;
-        const ancho = ficha.offsetWidth, alto = ficha.offsetHeight;
-        const derecha = right - ancho, abajo = Math.max(top, bottom - alto);
-        const posicionesX = [derecha, ...d3.range(derecha - 12, left, -12), left];
-        const posicionesY = [abajo, ...d3.range(abajo - 12, top, -12), top];
-        const marcas = [...marcasFicha];
-        const anillo = contenedor.querySelector(".punto-consultado");
-        if (anillo?.getAttribute("opacity") === "1") {
-          const x = +anillo.getAttribute("cx"), y = +anillo.getAttribute("cy"), r = +anillo.getAttribute("r") + 2;
-          marcas.push({ left: x - r, right: x + r, top: y - r, bottom: y + r, peso: 100 });
-        }
-        let mejor = { x: derecha, y: abajo, costo: Infinity };
-        for (const y of posicionesY) {
-          for (const x of posicionesX) {
-            const caja = { left: x, right: x + ancho, top: y, bottom: y + alto };
-            const costo = marcas.reduce((total, marca) => total + (seSuperponen(caja, marca) ? marca.peso : 0), 0);
-            if (costo < mejor.costo) mejor = { x, y, costo };
-            if (costo === 0) break;
-          }
-          if (mejor.costo === 0) break;
-        }
-        ficha.style.left = `${mejor.x}px`;
-        ficha.style.top = `${mejor.y}px`;
+        ficha.style.left = `${right - ficha.offsetWidth}px`;
+        ficha.style.top = `${Math.max(top, bottom - ficha.offsetHeight)}px`;
       }
       function actualizarFicha(d = null, contexto = "") {
         const clave = `${d?.iso3 ?? ""}|${contexto}`;
@@ -625,7 +612,7 @@
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
         const actual = paso === null ? null : PASOS[paso];
-        const m = { top: 24, right: 14, bottom: 46, left: 44 };
+        const m = { top: 24, right: 14, bottom: 46, left: 60 };
 
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
         const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
@@ -647,10 +634,10 @@
             .tickFormat(v => v >= 1000 ? (v / 1000) + " mil" : v).tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
-        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
+        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje")
-          .attr("x", m.left + 4).attr("y", m.top - 8)
+        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
+          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
           .text("Esperanza de vida (años)");
 
         const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
@@ -700,14 +687,6 @@
           });
 
         areaFicha = { left: m.left + 8, top: m.top + 8, right: ancho - m.right - 8, bottom: alto - m.bottom - 8 };
-        marcasFicha = visibles.map(d => {
-          const cx = x(d.pib), cy = y(d.vida), r = radio(d) + 1;
-          return { left: cx - r, right: cx + r, top: cy - r, bottom: cy + r, peso: r >= 3 ? 4 : 1 };
-        });
-        for (const etiqueta of svg.selectAll(".etiqueta").nodes()) {
-          const caja = etiqueta.getBBox();
-          marcasFicha.push({ left: caja.x - 2, right: caja.x + caja.width + 2, top: caja.y - 2, bottom: caja.y + caja.height + 2, peso: 20 });
-        }
         const anillo = svg.append("circle").attr("class", "punto-consultado").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("opacity", 0);
 
         const delaunay = d3.Delaunay.from(visibles, d => x(d.pib), d => y(d.vida));
@@ -970,7 +949,7 @@
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
         const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
-        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 44 };
+        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 60 };
 
         const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
         const todos = recorridos.flatMap(r => r.datos);
@@ -995,10 +974,10 @@
           .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
-        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
+        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje")
-          .attr("x", m.left + 4).attr("y", m.top - 8)
+        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
+          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
           .text("Esperanza de vida (años)");
 
         const plano = svg.append("g").attr("clip-path", null);
