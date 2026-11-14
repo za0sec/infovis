@@ -198,6 +198,37 @@
     .tooltip dl { display: grid; grid-template-columns: auto auto; gap: 1px 14px; margin: 0; }
     .tooltip dt { color: var(--texto-2); }
     .tooltip dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+    #ranking .ficha-ranking { position: static; opacity: 1; width: 250px; min-width: 0; max-width: 100%; min-height: 220px; margin: 12px 0 0 auto; padding: 14px; box-shadow: none; }
+    #ranking .ficha-ranking.interior { position: absolute; right: 0; bottom: 16px; margin: 0; }
+    #ranking .ficha-ranking dl { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; font-size: 12px; }
+    #ranking .ficha-ranking .t-region { min-height: 36px; color: var(--texto-2); }
+    @media (max-width: 640px) { #ranking .ficha-ranking { width: 100%; } }
+    #trayectorias .ficha-ranking { position: static; opacity: 1; width: 330px; min-width: 0; max-width: 100%; min-height: 180px; margin: 12px 0 0 auto; padding: 14px; box-shadow: none; }
+    #trayectorias .ficha-ranking.interior { position: absolute; right: 14px; bottom: 60px; margin: 0; }
+    #trayectorias .ficha-ranking dl { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
+    #trayectorias .ficha-ranking .t-region { min-height: 20px; color: var(--texto-2); }
+    @media (max-width: 640px) { #trayectorias .ficha-ranking { width: 100%; } }
+    #dispersion .ficha-pais { position: static; opacity: 1; min-width: 0; margin-top: 12px; padding: 16px; box-shadow: none; pointer-events: auto; }
+    .ficha-pais .t-pais { min-height: 22px; }
+    .ficha-pais .t-contexto { min-height: 40px; margin: 2px 0 12px; color: var(--texto-2); font-size: 12px; }
+    #dispersion .ficha-pais dl { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .ficha-pais dl > div { min-width: 0; }
+    .ficha-pais dt { min-height: 38px; font-size: 12px; }
+    #dispersion .ficha-pais dd { min-height: 44px; margin: 2px 0 0; text-align: left; }
+    .ficha-pais .dato-brecha dd { font-size: 15px; }
+    #dispersion.ficha-interior .ficha-pais { position: absolute; right: 14px; bottom: 60px; width: 330px; margin: 0; padding: 14px; pointer-events: none; }
+    #dispersion.ficha-interior .t-contexto { min-height: 36px; margin-bottom: 10px; }
+    #dispersion.ficha-interior .ficha-pais dl { grid-template-columns: 1fr; gap: 8px; }
+    #dispersion.ficha-interior .ficha-pais dl > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: baseline; }
+    #dispersion.ficha-interior .ficha-pais dt,
+    #dispersion.ficha-interior .ficha-pais dd { min-height: 0; margin: 0; }
+    #dispersion.ficha-interior .ficha-pais dd { text-align: right; }
+    #dispersion.ficha-interior .dato-brecha dd { font-size: 14px; }
+    @media (max-width: 640px) {
+      #dispersion .ficha-pais dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ficha-pais .t-pais { min-height: 42px; }
+      .ficha-pais .t-contexto { min-height: 72px; }
+    }
 
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
     .nombre-fila { fill: var(--texto); font-size: 13px; }
@@ -275,7 +306,7 @@
           </label>
         </div>
         <div class="leyenda" id="leyenda-brecha"></div>
-        <div class="lienzo" id="dispersion"><div class="tooltip" role="status"></div></div>
+        <div class="lienzo" id="dispersion"><div class="tooltip ficha-pais" role="status" aria-live="polite" aria-atomic="true"></div></div>
       </div>
       <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales constantes de 2021), 2024. El eje horizontal es logarítmico: cada marca duplica o multiplica el ingreso. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
     </figure>
@@ -396,8 +427,9 @@
       return leyenda;
     }
 
-    function tooltip(contenedor) {
+    function tooltip(contenedor, fija = false) {
       const el = contenedor.querySelector(".tooltip");
+      if (fija) el.classList.add("ficha-ranking");
       return {
         mostrar(filas, titulo, subtitulo, x, y) {
           el.replaceChildren();
@@ -410,12 +442,34 @@
             dl.append(dt, dd);
           }
           el.append(t, s, dl);
+          if (fija) {
+            const svg = contenedor.querySelector("svg");
+            el.classList.toggle("interior", contenedor.clientWidth >= 900 && svg?.getBoundingClientRect().height > el.offsetHeight + 40);
+            if (el.classList.contains("interior")) {
+              const caja = el.getBoundingClientRect();
+              const tapaDatos = [...svg.querySelectorAll("path, text, circle")].some(marca => {
+                if (marca.getAttribute("opacity") === "0") return false;
+                const r = marca.getBoundingClientRect();
+                if (!(r.right > caja.left && r.left < caja.right && r.bottom > caja.top && r.top < caja.bottom)) return false;
+                if (marca.tagName.toLowerCase() !== "path" || contenedor.id !== "trayectorias") return true;
+                // La caja de una trayectoria abarca también espacio vacío: comprobar el trazo real.
+                const longitud = marca.getTotalLength(), matriz = marca.getScreenCTM();
+                for (let distancia = 0; distancia <= longitud + 4; distancia += 4) {
+                  const punto = marca.getPointAtLength(Math.min(distancia, longitud)).matrixTransform(matriz);
+                  if (punto.x >= caja.left - 2 && punto.x <= caja.right + 2 && punto.y >= caja.top - 2 && punto.y <= caja.bottom + 2) return true;
+                }
+                return false;
+              });
+              if (tapaDatos) el.classList.remove("interior");
+            }
+            return;
+          }
           const ancho = contenedor.clientWidth, w = el.offsetWidth, h = el.offsetHeight;
           el.style.left = Math.max(0, Math.min(x + 14, ancho - w)) + "px";
           el.style.top = Math.max(0, y - h - 12) + "px";
           el.classList.add("visible");
         },
-        ocultar() { el.classList.remove("visible"); },
+        ocultar() { if (!fija) el.classList.remove("visible"); },
       };
     }
 
@@ -447,7 +501,46 @@
 
     function dispersion(paises, modelo) {
       const contenedor = document.getElementById("dispersion");
-      const tip = tooltip(contenedor);
+      const ficha = contenedor.querySelector(".ficha-pais");
+      let ultimaFicha = null;
+      function ubicarFicha() {
+        contenedor.classList.toggle("ficha-interior", contenedor.clientWidth >= 900);
+        if (!contenedor.classList.contains("ficha-interior")) return;
+        const caja = ficha.getBoundingClientRect();
+        const tapaPuntos = [...contenedor.querySelectorAll("svg circle")].some(punto => {
+          const p = punto.getBoundingClientRect();
+          return p.right > caja.left && p.left < caja.right && p.bottom > caja.top && p.top < caja.bottom;
+        });
+        if (tapaPuntos) contenedor.classList.remove("ficha-interior");
+      }
+      function actualizarFicha(d = null, contexto = "") {
+        const clave = `${d?.iso3 ?? ""}|${contexto}`;
+        if (clave === ultimaFicha) return;
+        ultimaFicha = clave;
+        ficha.replaceChildren();
+        const titulo = document.createElement("div");
+        titulo.className = "t-pais";
+        titulo.textContent = d?.pais ?? "Explorá un país";
+        const detalle = document.createElement("p");
+        detalle.className = "t-contexto";
+        detalle.textContent = d ? `${d.region} · ${contexto}` : "Pasá por un punto, tocalo o buscá un país para ver sus datos.";
+        const dl = document.createElement("dl");
+        const brecha = d ? (d.brecha === 0 ? "Coincide con el modelo" : `${fmt.coma(fmt.anios(Math.abs(d.brecha)))} años ${d.brecha > 0 ? "por encima" : "por debajo"}`) : "—";
+        for (const [etiqueta, valor, clase] of [
+          ["Brecha respecto del modelo", brecha, "dato-brecha"],
+          ["Esperanza de vida", d ? fmt.coma(fmt.anios(d.vida)) + " años" : "—", ""],
+          ["PIB por habitante · PPA, $ int. de 2021", d ? fmt.dinero(d.pib) : "—", ""],
+          ["Población", d ? fmt.pob(d.poblacion) : "—", ""],
+        ]) {
+          const grupo = document.createElement("div"); grupo.className = clase;
+          const dt = document.createElement("dt"); dt.textContent = etiqueta;
+          const dd = document.createElement("dd"); dd.textContent = valor;
+          grupo.append(dt, dd); dl.append(grupo);
+        }
+        ficha.append(titulo, detalle, dl);
+        ubicarFicha();
+      }
+      const tip = { ocultar: () => actualizarFicha() };
       const buscar = document.getElementById("buscar");
       const region = document.getElementById("region");
       // Posición de la etiqueta respecto del círculo para evitar choques en la zona más poblada
@@ -507,6 +600,7 @@
 
       function dibujar() {
         const ancho = contenedor.clientWidth;
+        contenedor.classList.toggle("ficha-interior", ancho >= 900);
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
         const actual = paso === null ? null : PASOS[paso];
@@ -589,27 +683,24 @@
         const delaunay = d3.Delaunay.from(paises, d => x(d.pib), d => y(d.vida));
         const mostrar = (d) => {
           anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("r", Math.max(6.5, radio(d) + 3)).attr("opacity", 1);
-          tip.mostrar([
-            ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-            ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
-            ["Diferencia", fmt.signo(d.brecha) + " años"],
-            ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
-            ["Población", fmt.pob(d.poblacion)],
-          ], d.pais, d.region, x(d.pib), y(d.vida));
+          actualizarFicha(d, seleccion?.iso3 === d.iso3 ? "País seleccionado" : seleccion ? `Consulta momentánea. Seleccionado: ${seleccion.pais}` : "País consultado");
+        };
+        const restaurarFicha = () => {
+          if (seleccion) mostrar(seleccion);
+          else { tip.ocultar(); anillo.attr("opacity", 0); }
         };
         svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
-          .on("pointermove", ev => {
+          .on("pointermove click", ev => {
+            if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             const [px, py] = d3.pointer(ev);
             const d = paises[delaunay.find(px, py)];
-            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { tip.ocultar(); anillo.attr("opacity", 0); return; }
+            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { restaurarFicha(); return; }
             mostrar(d);
           })
-          .on("pointerleave", () => {
-            tip.ocultar();
-            if (seleccion) mostrar(seleccion); else anillo.attr("opacity", 0);
-          });
+          .on("pointerleave", ev => { if (ev.pointerType !== "touch") restaurarFicha(); });
 
-        if (seleccion) mostrar(seleccion);
+        restaurarFicha();
+        ubicarFicha();
       }
 
       // Buscar o filtrar saca al lector del recorrido guiado y lo deja explorar libremente
@@ -629,7 +720,7 @@
     }
     function ranking(paises) {
       const contenedor = document.getElementById("ranking");
-      const tip = tooltip(contenedor);
+      const tip = tooltip(contenedor, true);
       const region = document.getElementById("region-ranking");
       const chicos = document.getElementById("chicos");
       const resumen = document.getElementById("resumen-ranking");
@@ -725,20 +816,21 @@
           .text(d => fmt.signo(d.brecha));
         g.append("rect").attr("x", 0).attr("width", ancho).attr("y", (d, i) => yDe(i)).attr("height", fila)
           .attr("fill", "transparent").attr("tabindex", 0)
-          .on("pointerenter focus", function (ev, d) {
+          .on("pointerenter focus click", function (ev, d) {
             d3.select(this.parentNode).select("path").attr("opacity", .75);
             const i = recorte.indexOf(d);
             tip.mostrar([
-              ["Diferencia", fmt.signo(d.brecha) + " años"],
+              ["Brecha respecto del modelo", fmt.signo(d.brecha) + " años"],
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-              ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
               ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
-              ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
-              ["Gasto en salud por habitante (PPA)", d.gasto_salud != null ? fmt.dinero(d.gasto_salud) + ` $ int. corrientes (${d.anio_gasto})` : "s/d"],
-              ["Mortalidad < 5 años", d.mortalidad_5 != null ? fmt.coma(d.mortalidad_5) + " ‰" : "s/d"],
             ], d.pais, d.region, x(d.brecha), yDe(i));
           })
           .on("pointerleave blur", function () { d3.select(this.parentNode).select("path").attr("opacity", 1); tip.ocultar(); });
+        tip.mostrar([
+          ["Brecha respecto del modelo", "—"],
+          ["Esperanza de vida", "—"],
+          ["Mujeres / varones", "—"],
+        ], "Explorá un país", "Pasá por una fila, tocala o usá Tab para ver sus datos.");
       }
 
       region.addEventListener("change", dibujar);
@@ -776,7 +868,7 @@
     }
     function trayectorias(paises, puntos, modelo) {
       const contenedor = document.getElementById("trayectorias");
-      const tip = tooltip(contenedor);
+      const tip = tooltip(contenedor, true);
       const porPais = d3.group(puntos.filter(d => d.pib > 0 && Number.isFinite(d.vida)), d => d.iso3);
       for (const serie of porPais.values()) serie.sort((a, b) => a.anio - b.anio);
       const nombre = new Map(paises.map(d => [d.iso3, d.pais]));
@@ -957,7 +1049,8 @@
         const objetivos = recorridos.flatMap(r => r.datos.map(d => ({ ...d, iso3: r.iso3 })));
         const delaunay = d3.Delaunay.from(objetivos, d => x(d.pib), d => y(d.vida));
         svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
-          .on("pointermove", ev => {
+          .on("pointermove click", ev => {
+            if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             if (!objetivos.length) return;
             const [px, py] = d3.pointer(ev);
             const d = objetivos[delaunay.find(px, py)];
@@ -968,9 +1061,14 @@
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
               ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
               [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
-            ], nombre.get(d.iso3), String(d.anio), x(d.pib), y(d.vida));
+            ], nombre.get(d.iso3), `Año ${d.anio}`, x(d.pib), y(d.vida));
           })
           .on("pointerleave", () => { tip.ocultar(); anillo.attr("opacity", 0); });
+        tip.mostrar([
+          ["Esperanza de vida", "—"],
+          ["PIB por habitante (PPA, $ int. de 2021)", "—"],
+          ["Cambio desde el primer año", "—"],
+        ], activos.length ? "Explorá una trayectoria" : "Elegí un país", activos.length ? "Pasá por un punto o tocalo para ver el año y sus datos." : "Usá los selectores para ver su evolución.");
       }
 
       dibujar();
