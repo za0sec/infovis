@@ -19,7 +19,7 @@ El modelo basado en el PIB per cápita da cuenta del 74,4 % de la variación obs
 
 ## Notebooks
 
-**Entrega:** [`vivir_mas_sin_ser_mas_rico.ipynb`](vivir_mas_sin_ser_mas_rico.ipynb) ([abrir en Colab](https://colab.research.google.com/github/za0sec/infovis/blob/main/TPFinal/vivir_mas_sin_ser_mas_rico.ipynb)). Descarga los datos de la API, explora la cobertura de los indicadores y muestra los tres gráficos: PIB por habitante y esperanza de vida (el mismo código que la nota), acceso básico al agua y vacunación contra el sarampión, estos dos con un deslizador de años. Corre con «Ejecutar todo» en una sesión nueva.
+**Entrega:** [`vivir_mas_sin_ser_mas_rico.ipynb`](vivir_mas_sin_ser_mas_rico.ipynb) ([abrir en Colab](https://colab.research.google.com/github/za0sec/infovis/blob/main/TPFinal/vivir_mas_sin_ser_mas_rico.ipynb)). Explora el catálogo de Data360, descarga los datos de la API, analiza la cobertura de los indicadores y arma con Altair los tres gráficos: PIB por habitante y esperanza de vida, acceso básico al agua y vacunación contra el sarampión. Los dos últimos tienen un deslizador de años. Corre con «Ejecutar todo» en una sesión nueva.
 
 Notebooks de trabajo, en `exploracion/`:
 
