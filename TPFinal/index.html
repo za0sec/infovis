@@ -189,7 +189,7 @@
     .etiqueta { fill: var(--texto); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
     .etiqueta.suave { fill: var(--texto-2); font-weight: 400; }
 
-    .tooltip { position: absolute; z-index: 5; min-width: 190px; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, .14); font-size: 13px; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity .12s; }
+    .tooltip { position: absolute; z-index: 5; min-width: min(190px, 100%); max-width: 100%; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, .14); font-size: 13px; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity .12s; }
     .tooltip.visible { opacity: 1; }
     .tooltip .t-pais { font-size: 14px; font-weight: 600; }
     .tooltip .t-region { margin-bottom: 6px; color: var(--texto-3); font-size: 12px; }
@@ -276,7 +276,7 @@
         <div class="leyenda" id="leyenda-brecha"></div>
         <div class="lienzo" id="dispersion"><div class="tooltip" role="status"></div></div>
       </div>
-      <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales de 2021), 2024. El eje horizontal es logarítmico: cada marca duplica o multiplica el ingreso. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
+      <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales constantes de 2021), 2024. El eje horizontal es logarítmico: cada marca duplica o multiplica el ingreso. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
@@ -316,7 +316,7 @@
       <p>Pero entre los países ricos, el caso más llamativo tal vez sea otro.</p>
 
       <h2>Más dinero no compra más años</h2>
-      <p><strong>Estados Unidos</strong> es la economía grande más rica del mundo por habitante y la que más gasta en salud: unos 13.500 dólares por persona por año, siete veces más que <strong>Costa Rica</strong>. Sin embargo, un costarricense vive en promedio dos años más que un estadounidense. Con su nivel de ingreso, Estados Unidos «debería» tener una esperanza de vida de 82 años; tiene 79.</p>
+      <p>En 2023, <strong>Estados Unidos</strong> gastó 13.473 dólares internacionales corrientes por habitante en salud y <strong>Costa Rica</strong>, 1.928. En paridad de poder adquisitivo, el gasto por habitante de Estados Unidos fue unas siete veces el de Costa Rica. Sin embargo, un costarricense vive en promedio dos años más que un estadounidense. Con su nivel de ingreso, Estados Unidos «debería» tener una esperanza de vida de 82 años; tiene 79.</p>
       <p>La diferencia no apareció de un día para el otro. Si se sigue el recorrido de cada país desde 1990, se ve que el ingreso estadounidense siguió creciendo mientras su esperanza de vida se estancaba. Otros países, con mucho menos, avanzaron más rápido.</p>
     </div>
 
@@ -330,12 +330,12 @@
         <div class="lienzo" id="trayectorias"><div class="tooltip" role="status"></div></div>
         <ul class="resumen" id="resumen-trayectorias"></ul>
       </div>
-      <figcaption>Esperanza de vida al nacer y PIB per cápita PPA (dólares internacionales de 2021), 1990–2024. Eje horizontal logarítmico. En gris, todos los países en 2024 y la línea de esperanza de vida esperada según el ingreso. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
+      <figcaption>Esperanza de vida al nacer y PIB per cápita PPA (dólares internacionales constantes de 2021), 1990–2024. Eje horizontal logarítmico. En gris, todos los países en 2024 y la línea de esperanza de vida esperada según el ingreso. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
       <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. El pozo que se ve en casi todas las trayectorias en 2020 y 2021 es la pandemia de COVID-19, de la que la mayoría de los países ya se recuperó.</p>
-      <p>Con los botones de arriba del gráfico se pueden explorar otras historias. <strong>Polonia</strong> y <strong>Rusia</strong> tienen hoy un ingreso por habitante parecido, pero los polacos viven cinco años más. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares por persona y ganó diez años de vida. <strong>Gabón</strong>, en cambio, es más pobre que en 1990.</p>
+      <p>Con los botones de arriba del gráfico se pueden explorar otras historias. <strong>Polonia</strong> y <strong>Rusia</strong> tienen hoy un ingreso por habitante parecido, pero los polacos viven cinco años más. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. <strong>Gabón</strong>, en cambio, es más pobre que en 1990.</p>
       <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
 
       <h2>Lo que dicen (y lo que no) estos datos</h2>
@@ -348,7 +348,7 @@
         <li>Esperanza de vida al nacer, total (<code>WB_WDI_SP_DYN_LE00_IN</code>).</li>
         <li>PIB per cápita en paridad de poder adquisitivo, dólares internacionales constantes de 2021 (<code>WB_WDI_NY_GDP_PCAP_PP_KD</code>).</li>
         <li>Población total (<code>WB_WDI_SP_POP_TOTL</code>).</li>
-        <li>Gasto corriente en salud per cápita, PPA (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
+        <li>Gasto corriente en salud per cápita en PPA, dólares internacionales corrientes (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
         <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
       </ul>
       <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no depende de esa elección: con una curva cuadrática o con una regresión ponderada por población, las brechas casi no cambian (correlación mayor a 0,99). Tampoco es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
@@ -369,7 +369,7 @@
   <script>
     const fmt = {
       anios: d3.format(".1f"),
-      dinero: v => "US$ " + d3.format(",.0f")(v).replace(/,/g, "."),
+      dinero: v => d3.format(",.0f")(v).replace(/,/g, "."),
       pob: v => v >= 1e6 ? d3.format(".1f")(v / 1e6).replace(".", ",") + " millones" : d3.format(",.0f")(v).replace(/,/g, ".") + " hab.",
       signo: v => (v > 0 ? "+" : v < 0 ? "−" : "") + d3.format(".1f")(Math.abs(v)).replace(".", ","),
       coma: v => String(v).replace(".", ","),
@@ -528,7 +528,7 @@
           .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
           .call(g => g.select(".domain").remove());
         svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
-          .text("PIB por habitante (US$ PPA, escala log) →");
+          .text("PIB por habitante (PPA, escala log) →");
         svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2)
           .text("↑ Años de vida");
 
@@ -586,7 +586,7 @@
             ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
             ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
             ["Diferencia", fmt.signo(d.brecha) + " años"],
-            ["PIB por habitante", fmt.dinero(d.pib)],
+            ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
             ["Población", fmt.pob(d.poblacion)],
           ], d.pais, d.region, x(d.pib), y(d.vida));
         };
@@ -715,8 +715,8 @@
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
               ["Esperada por su ingreso", fmt.coma(fmt.anios(d.esperada)) + " años"],
               ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
-              ["PIB por habitante", fmt.dinero(d.pib)],
-              ["Gasto en salud por hab.", d.gasto_salud ? fmt.dinero(d.gasto_salud) + ` (${d.anio_gasto})` : "s/d"],
+              ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
+              ["Gasto en salud por habitante (PPA)", d.gasto_salud != null ? fmt.dinero(d.gasto_salud) + ` $ int. corrientes (${d.anio_gasto})` : "s/d"],
               ["Mortalidad < 5 años", d.mortalidad_5 != null ? fmt.coma(d.mortalidad_5) + " ‰" : "s/d"],
             ], d.pais, d.region, x(d.brecha), yDe(i));
           })
@@ -735,8 +735,8 @@
         { clave: "vida", titulo: "Esperanza de vida", texto: d => fmt.coma(fmt.anios(d.vida)) },
         { clave: "esperada", titulo: "Esperada", texto: d => fmt.coma(fmt.anios(d.esperada)) },
         { clave: "brecha", titulo: "Diferencia", texto: d => fmt.signo(d.brecha) },
-        { clave: "pib", titulo: "PIB por hab. (US$ PPA)", texto: d => fmt.dinero(d.pib).replace("US$ ", "") },
-        { clave: "gasto_salud", titulo: "Gasto en salud por hab.", texto: d => d.gasto_salud ? fmt.dinero(d.gasto_salud).replace("US$ ", "") : "s/d" },
+        { clave: "pib", titulo: "PIB por hab. (PPA, $ int. de 2021)", texto: d => fmt.dinero(d.pib) },
+        { clave: "gasto_salud", titulo: "Gasto en salud por hab. (PPA, $ int. corrientes)", texto: d => d.gasto_salud != null ? `${fmt.dinero(d.gasto_salud)} (${d.anio_gasto})` : "s/d" },
       ];
       const t = d3.select("#tabla");
       let orden = { clave: "brecha", asc: false };
@@ -838,7 +838,7 @@
           .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
           .call(g => g.select(".domain").remove());
         svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
-          .text("PIB por habitante (US$ PPA, escala log) →");
+          .text("PIB por habitante (PPA, escala log) →");
         svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2).text("↑ Años de vida");
 
         const plano = svg.append("g").attr("clip-path", null);
@@ -899,7 +899,7 @@
             const inicio = porPais.get(d.iso3).find(p => p.pib && p.vida);
             tip.mostrar([
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-              ["PIB por habitante", fmt.dinero(d.pib)],
+              ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
               [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
             ], nombre.get(d.iso3), String(d.anio), x(d.pib), y(d.vida));
           })
