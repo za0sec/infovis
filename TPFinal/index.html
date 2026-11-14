@@ -231,7 +231,7 @@
 
       <div class="cifras" id="cifras">
         <div class="cifra"><b data-cifra="duplicar">+3,6 años</b><span>de esperanza de vida, en promedio, cada vez que se duplica el ingreso por habitante</span></div>
-        <div class="cifra"><b data-cifra="r2">74 %</b><span>de las diferencias entre países se explica solo con el ingreso</span></div>
+        <div class="cifra"><b data-cifra="r2">74,4 %</b><span>de la variación en esperanza de vida que recoge el modelo con PIB per cápita en 195 economías</span></div>
         <div class="cifra"><b>2,1 años</b><span>más vive Costa Rica que Estados Unidos, con un tercio de su ingreso</span></div>
       </div>
     </div>
@@ -330,7 +330,8 @@
         <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
       </ul>
       <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. Comprobamos que el resultado no depende de esa elección: con una curva cuadrática o con una regresión ponderada por población, las brechas casi no cambian (correlación mayor a 0,99). Tampoco es un efecto de la pandemia: las brechas de 2024 tienen una correlación de 0,86 con las de 2019.</p>
-      <p>Si al ingreso se le suma la mortalidad de menores de 5 años, la explicación sube del 74 % al <span data-cifra="r2-mortalidad">85 %</span>. Parte de la brecha se juega en la infancia, pero no toda: Estados Unidos tiene una mortalidad infantil baja en términos mundiales y aun así queda por debajo de lo esperado. Las brechas por sexo se calcularon con el mismo método, usando la esperanza de vida de mujeres y de varones.</p>
+      <p>Entre las <span data-cifra="n-mortalidad">186</span> economías con datos completos, el modelo basado en el PIB per cápita da cuenta del <span data-cifra="r2-pib-muestra-mortalidad">73,4 %</span> de la variación observada en la esperanza de vida. Al incorporar la mortalidad de menores de 5 años, la proporción sube al <span data-cifra="r2-mortalidad">84,5 %</span>. Parte de esa mejora refleja que la esperanza de vida al nacer ya incorpora la mortalidad en esas edades. La comparación mide el ajuste dentro de la muestra y no permite estimar un efecto causal.</p>
+      <p>Las brechas por sexo se calcularon con el mismo método, usando la esperanza de vida de mujeres y de varones.</p>
       <p>Hay que tener en cuenta algunas limitaciones. La esperanza de vida anual es una estimación de Naciones Unidas que se interpola a partir de datos quinquenales. Quedan afuera los países sin PIB en PPA reciente, como Cuba, Venezuela, Siria o Yemen. Y una correlación entre ingreso y salud no indica, por sí sola, en qué dirección va la causa.</p>
       <p>La exploración de la API, la limpieza de los datos y el análisis están en <a href="https://github.com/za0sec/infovis/tree/main/TPFinal/exploracion">notebooks de Python</a> que se pueden abrir en Colab. Los datos procesados se pueden descargar en <a href="datos/paises_2024.csv">CSV</a>.</p>
     </div>
@@ -350,6 +351,7 @@
       pob: v => v >= 1e6 ? d3.format(".1f")(v / 1e6).replace(".", ",") + " millones" : d3.format(",.0f")(v).replace(/,/g, ".") + " hab.",
       signo: v => (v > 0 ? "+" : v < 0 ? "−" : "") + d3.format(".1f")(Math.abs(v)).replace(".", ","),
       coma: v => String(v).replace(".", ","),
+      porcentaje: v => fmt.coma((v * 100).toFixed(1)) + " %",
     };
 
     const CLASES = [
@@ -400,8 +402,10 @@
     ]).then(([paises, modelo]) => {
       paises.sort((a, b) => b.poblacion - a.poblacion);
       document.querySelector('[data-cifra="duplicar"]').textContent = "+" + fmt.coma((modelo.b * Math.LN2).toFixed(1)) + " años";
-      document.querySelector('[data-cifra="r2"]').textContent = Math.round(modelo.r2 * 100) + " %";
-      document.querySelector('[data-cifra="r2-mortalidad"]').textContent = Math.round(modelo.r2_mortalidad * 100) + " %";
+      document.querySelector('[data-cifra="r2"]').textContent = fmt.porcentaje(modelo.r2);
+      document.querySelector('[data-cifra="r2-mortalidad"]').textContent = fmt.porcentaje(modelo.r2_mortalidad);
+      document.querySelector('[data-cifra="r2-pib-muestra-mortalidad"]').textContent = fmt.porcentaje(modelo.r2_pib_muestra_mortalidad);
+      document.querySelector('[data-cifra="n-mortalidad"]').textContent = modelo.paises_muestra_mortalidad;
       document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
       dispersion(paises, modelo);
       ranking(paises);
