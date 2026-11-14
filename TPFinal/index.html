@@ -284,7 +284,7 @@
       <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
 
       <h2>Los que se salen del patrón</h2>
-      <p>Si se mide la distancia de cada país a esa línea aparece un ranking distinto del habitual. No es el de quién vive más, sino el de quién vive más (o menos) de lo que le correspondería por su nivel de ingreso.</p>
+      <p>El ejemplo de Costa Rica muestra cómo se mide la brecha. Si ordenamos a los países por esa distancia, ¿quiénes quedan más por encima o por debajo de la línea y por cuántos años?</p>
     </div>
 
     <figure class="ancho" id="fig-ranking">
@@ -457,28 +457,20 @@
       leyenda.append("span").call(s => s.append("i").attr("class", "linea"))
         .call(s => s.append("span").text("Esperada según el ingreso"));
 
+      const costaRica = paises.find(d => d.iso3 === "CRI");
       const PASOS = [
         {
           boton: "La regla",
           color: "--recta",
-          texto: `Casi todos los países se ubican cerca de la línea. Cada vez que el ingreso por habitante se duplica, la esperanza de vida sube en promedio ${fmt.coma((modelo.b * Math.LN2).toFixed(1))} años.`,
+          texto: `Entre las economías de 2024, el modelo estima ${fmt.coma((modelo.b * Math.LN2).toFixed(1))} años más de esperanza de vida por cada duplicación del PIB por habitante.`,
           activo: () => true,
         },
         {
-          boton: "Por encima",
+          boton: "Cómo se mide la brecha",
           color: "--mas-fuerte",
-          texto: "Se resaltan en azul los países que viven al menos 3 años más de lo que predice su ingreso: Japón entre los ricos, Costa Rica y Chile en América Latina, Sri Lanka y Bangladés en Asia.",
-          activo: d => d.brecha >= 3,
-          etiquetas: { JOR: "arriba", LKA: "izq", JPN: "der", CRI: "der", CHL: "arriba", BGD: "izq", ECU: "abajo" },
-          movil: { JOR: "arriba", LKA: "izq", JPN: "izq", CRI: "izq" },
-        },
-        {
-          boton: "Por debajo",
-          color: "--menos-fuerte",
-          texto: "Se resaltan en coral los países que viven al menos 3 años menos de lo esperado. La mitad está en África subsahariana. El resto son sobre todo islas pequeñas del Caribe y el Pacífico, ex repúblicas soviéticas y dos países grandes y ricos: Rusia y Estados Unidos.",
-          activo: d => d.brecha <= -2.95,
-          etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
-          movil: { NGA: "der", RUS: "izq", USA: "abajo" },
+          texto: `Al PIB por habitante de Costa Rica, la línea marca ${fmt.coma(fmt.anios(costaRica.esperada))} años. El punto observado está en ${fmt.coma(fmt.anios(costaRica.vida))}. La distancia vertical entre ambos es la brecha: ${fmt.signo(costaRica.brecha)} años.`,
+          activo: d => d === costaRica,
+          ejemplo: costaRica,
         },
       ];
       let paso = 0;
@@ -541,14 +533,28 @@
         const activo = actual ? actual.activo
           : d => (!filtro || d.region === filtro) && (!seleccion || d.iso3 === seleccion.iso3);
 
+        if (actual?.ejemplo) {
+          const d = actual.ejemplo;
+          const cx = x(d.pib);
+          const observada = y(d.vida);
+          const esperada = y(modelo.a + modelo.b * Math.log(d.pib));
+          const marca = svg.append("g").attr("class", "marca-brecha");
+          marca.append("path")
+            .attr("d", `M${cx},${observada}V${esperada}m-4,0h8`)
+            .attr("fill", "none").attr("stroke", "var(--mas-fuerte)").attr("stroke-width", 2);
+          marca.append("text").attr("class", "etiqueta")
+            .attr("x", cx + 8).attr("y", (observada + esperada) / 2 + 4)
+            .text(`${fmt.signo(d.brecha)} años`);
+        }
+
         svg.append("g").selectAll("circle").data(paises).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
           .attr("fill", d => `var(${claseDe(d.brecha).token})`)
           .attr("fill-opacity", d => activo(d) ? .88 : .12);
 
-        const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
+        const posiciones = actual?.ejemplo ? { CRI: "izq" } : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
-          : actual?.etiquetas ? Object.keys(posiciones).map(iso3 => paises.find(d => d.iso3 === iso3)).filter(Boolean)
+          : actual?.ejemplo ? [actual.ejemplo]
           : paises.filter(d => (filtro ? d.region === filtro && Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
               .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
         const ocupadas = [];
