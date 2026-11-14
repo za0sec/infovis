@@ -153,6 +153,9 @@
     .pasos button:hover { border-color: var(--texto-3); color: var(--texto); }
     .pasos button[aria-pressed="true"] { border-color: var(--texto); background: var(--texto); color: var(--superficie); }
     .pasos button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+    #trayectorias [role="slider"]:focus { outline: none; }
+    #trayectorias [role="slider"]:focus-visible .recorrido-anual { stroke-width: 3.5; }
+    .ayuda-teclado { margin: 0 0 10px; color: var(--texto-2); font-size: 13px; }
     .paso-texto { min-height: 3.1em; margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--acento); background: var(--pagina); color: var(--texto); font-size: 15px; line-height: 1.5; }
     .paso-texto:empty { display: none; }
     #pasos { gap: 8px; }
@@ -198,36 +201,19 @@
     .tooltip dl { display: grid; grid-template-columns: auto auto; gap: 1px 14px; margin: 0; }
     .tooltip dt { color: var(--texto-2); }
     .tooltip dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-    #ranking .ficha-ranking { position: static; opacity: 1; width: 250px; min-width: 0; max-width: 100%; min-height: 220px; margin: 12px 0 0 auto; padding: 14px; box-shadow: none; }
+    :is(#dispersion, #ranking, #trayectorias) .tooltip { position: static; opacity: 1; width: 280px; min-width: 0; max-width: 100%; margin: 10px 0 0 auto; padding: 10px 12px; box-shadow: none; }
     #ranking .ficha-ranking.interior { position: absolute; right: 0; bottom: 16px; margin: 0; }
-    #ranking .ficha-ranking dl { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; font-size: 12px; }
-    #ranking .ficha-ranking .t-region { min-height: 36px; color: var(--texto-2); }
-    @media (max-width: 640px) { #ranking .ficha-ranking { width: 100%; } }
-    #trayectorias .ficha-ranking { position: static; opacity: 1; width: 330px; min-width: 0; max-width: 100%; min-height: 180px; margin: 12px 0 0 auto; padding: 14px; box-shadow: none; }
+    #ranking .ficha-ranking { width: 250px; }
     #trayectorias .ficha-ranking.interior { position: absolute; right: 14px; bottom: 60px; margin: 0; }
-    #trayectorias .ficha-ranking dl { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
-    #trayectorias .ficha-ranking .t-region { min-height: 20px; color: var(--texto-2); }
-    @media (max-width: 640px) { #trayectorias .ficha-ranking { width: 100%; } }
-    #dispersion .ficha-pais { position: static; opacity: 1; min-width: 0; margin-top: 12px; padding: 16px; box-shadow: none; pointer-events: auto; }
-    .ficha-pais .t-pais { min-height: 22px; }
-    .ficha-pais .t-contexto { min-height: 40px; margin: 2px 0 12px; color: var(--texto-2); font-size: 12px; }
-    #dispersion .ficha-pais dl { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-    .ficha-pais dl > div { min-width: 0; }
-    .ficha-pais dt { min-height: 38px; font-size: 12px; }
-    #dispersion .ficha-pais dd { min-height: 44px; margin: 2px 0 0; text-align: left; }
-    .ficha-pais .dato-brecha dd { font-size: 15px; }
-    #dispersion.ficha-interior .ficha-pais { position: absolute; right: 14px; bottom: 60px; width: 330px; margin: 0; padding: 14px; pointer-events: none; }
-    #dispersion.ficha-interior .t-contexto { min-height: 36px; margin-bottom: 10px; }
-    #dispersion.ficha-interior .ficha-pais dl { grid-template-columns: 1fr; gap: 8px; }
-    #dispersion.ficha-interior .ficha-pais dl > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: baseline; }
-    #dispersion.ficha-interior .ficha-pais dt,
-    #dispersion.ficha-interior .ficha-pais dd { min-height: 0; margin: 0; }
-    #dispersion.ficha-interior .ficha-pais dd { text-align: right; }
-    #dispersion.ficha-interior .dato-brecha dd { font-size: 14px; }
+    .tooltip .t-region, .ficha-pais .t-contexto { margin: 2px 0 7px; color: var(--texto-2); font-size: 12px; }
+    .tooltip .t-unidad { margin-top: 7px; color: var(--texto-2); font-size: 11px; }
+    :is(#ranking, #trayectorias) .tooltip dl { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+    #ranking .tooltip dl { font-size: 12px; }
+    #dispersion .ficha-pais dl { grid-template-columns: 1fr; gap: 4px; }
+    .ficha-pais dl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: baseline; }
+    #dispersion.ficha-interior .ficha-pais { position: absolute; right: 14px; bottom: 60px; margin: 0; }
     @media (max-width: 640px) {
-      #dispersion .ficha-pais dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .ficha-pais .t-pais { min-height: 42px; }
-      .ficha-pais .t-contexto { min-height: 72px; }
+      :is(#dispersion, #ranking, #trayectorias) .tooltip { width: 100%; }
     }
 
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
@@ -360,6 +346,7 @@
         <div class="pasos" id="atajos" aria-label="Comparaciones sugeridas"></div>
         <div class="controles" id="selectores"></div>
         <div class="leyenda" id="leyenda-trayectorias"></div>
+        <p class="ayuda-teclado" id="ayuda-trayectorias">Teclado: Tab para elegir una trayectoria; ← y → para recorrer sus años. Inicio y Fin van a los extremos.</p>
         <div class="lienzo" id="trayectorias"><div class="tooltip" role="status"></div></div>
         <ul class="resumen" id="resumen-trayectorias"></ul>
       </div>
@@ -431,7 +418,7 @@
       const el = contenedor.querySelector(".tooltip");
       if (fija) el.classList.add("ficha-ranking");
       return {
-        mostrar(filas, titulo, subtitulo, x, y) {
+        mostrar(filas, titulo, subtitulo, x, y, unidad = "") {
           el.replaceChildren();
           const t = document.createElement("div"); t.className = "t-pais"; t.textContent = titulo;
           const s = document.createElement("div"); s.className = "t-region"; s.textContent = subtitulo;
@@ -442,6 +429,10 @@
             dl.append(dt, dd);
           }
           el.append(t, s, dl);
+          if (unidad) {
+            const nota = document.createElement("div"); nota.className = "t-unidad"; nota.textContent = unidad;
+            el.append(nota);
+          }
           if (fija) {
             const svg = contenedor.querySelector("svg");
             el.classList.toggle("interior", contenedor.clientWidth >= 900 && svg?.getBoundingClientRect().height > el.offsetHeight + 40);
@@ -507,7 +498,7 @@
         contenedor.classList.toggle("ficha-interior", contenedor.clientWidth >= 900);
         if (!contenedor.classList.contains("ficha-interior")) return;
         const caja = ficha.getBoundingClientRect();
-        const tapaPuntos = [...contenedor.querySelectorAll("svg circle")].some(punto => {
+        const tapaPuntos = [...contenedor.querySelectorAll("svg circle, svg .etiqueta")].some(punto => {
           const p = punto.getBoundingClientRect();
           return p.right > caja.left && p.left < caja.right && p.bottom > caja.top && p.top < caja.bottom;
         });
@@ -523,13 +514,15 @@
         titulo.textContent = d?.pais ?? "Explorá un país";
         const detalle = document.createElement("p");
         detalle.className = "t-contexto";
-        detalle.textContent = d ? `${d.region} · ${contexto}` : "Pasá por un punto, tocalo o buscá un país para ver sus datos.";
+        detalle.textContent = d ? `${d.region} · ${contexto}` : "Pasá por un punto o buscá un país.";
+        ficha.append(titulo, detalle);
+        if (!d) { ubicarFicha(); return; }
         const dl = document.createElement("dl");
-        const brecha = d ? (d.brecha === 0 ? "Coincide con el modelo" : `${fmt.coma(fmt.anios(Math.abs(d.brecha)))} años ${d.brecha > 0 ? "por encima" : "por debajo"}`) : "—";
+        const brecha = fmt.signo(d.brecha) + " años";
         for (const [etiqueta, valor, clase] of [
-          ["Brecha respecto del modelo", brecha, "dato-brecha"],
+          ["Brecha del modelo", brecha, "dato-brecha"],
           ["Esperanza de vida", d ? fmt.coma(fmt.anios(d.vida)) + " años" : "—", ""],
-          ["PIB por habitante · PPA, $ int. de 2021", d ? fmt.dinero(d.pib) : "—", ""],
+          ["PIB por habitante", fmt.dinero(d.pib), ""],
           ["Población", d ? fmt.pob(d.poblacion) : "—", ""],
         ]) {
           const grupo = document.createElement("div"); grupo.className = clase;
@@ -537,7 +530,8 @@
           const dd = document.createElement("dd"); dd.textContent = valor;
           grupo.append(dt, dd); dl.append(grupo);
         }
-        ficha.append(titulo, detalle, dl);
+        const unidad = document.createElement("div"); unidad.className = "t-unidad"; unidad.textContent = "PIB en PPA · $ internacionales de 2021";
+        ficha.append(dl, unidad);
         ubicarFicha();
       }
       const tip = { ocultar: () => actualizarFicha() };
@@ -604,7 +598,7 @@
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
         const actual = paso === null ? null : PASOS[paso];
-        const m = { top: 12, right: 14, bottom: 46, left: 44 };
+        const m = { top: 28, right: 14, bottom: 46, left: 44 };
 
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
         const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
@@ -628,10 +622,10 @@
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
           .call(g => g.select(".domain").remove());
-        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
-          .text("PIB por habitante (PPA, escala log) →");
-        svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2)
-          .text("↑ Años de vida");
+        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
+          .text("PIB por habitante (PPA, escala log)");
+        svg.append("text").attr("class", "titulo-eje").attr("x", m.left).attr("y", 14)
+          .text("Esperanza de vida (años)");
 
         const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
         svg.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
@@ -820,17 +814,13 @@
             d3.select(this.parentNode).select("path").attr("opacity", .75);
             const i = recorte.indexOf(d);
             tip.mostrar([
-              ["Brecha respecto del modelo", fmt.signo(d.brecha) + " años"],
+              ["Brecha del modelo", fmt.signo(d.brecha) + " años"],
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
               ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
             ], d.pais, d.region, x(d.brecha), yDe(i));
           })
           .on("pointerleave blur", function () { d3.select(this.parentNode).select("path").attr("opacity", 1); tip.ocultar(); });
-        tip.mostrar([
-          ["Brecha respecto del modelo", "—"],
-          ["Esperanza de vida", "—"],
-          ["Mujeres / varones", "—"],
-        ], "Explorá un país", "Pasá por una fila, tocala o usá Tab para ver sus datos.");
+        tip.mostrar([], "Explorá un país", "Pasá por una fila o usá Tab.");
       }
 
       region.addEventListener("change", dibujar);
@@ -875,6 +865,7 @@
       const opciones = paises.filter(d => porPais.has(d.iso3)).sort((a, b) => d3.ascending(a.pais, b.pais));
       const SERIES = ["--serie-1", "--serie-2", "--serie-3"];
       const elegidos = ["USA", "CRI", "CHL"];
+      const anioConsultado = new Map();
       const ATAJOS = [
         { nombre: "EE. UU., Costa Rica y Chile", paises: ["USA", "CRI", "CHL"] },
         { nombre: "Argentina y vecinos", paises: ["ARG", "URY", "BRA"] },
@@ -902,6 +893,7 @@
       selects.property("value", d => d);
 
       function dibujar() {
+        const paisConFoco = contenedor.contains(document.activeElement) ? document.activeElement.getAttribute("data-pais-teclado") : null;
         tip.ocultar();
         const activos = elegidos.map((iso3, i) => ({ iso3, color: `var(${SERIES[i]})` })).filter(d => d.iso3);
         atajos.attr("aria-pressed", a => a.paises
@@ -929,7 +921,7 @@
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
         const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
-        const m = { top: 12, right: angosto ? 16 : 24, bottom: 46, left: 44 };
+        const m = { top: 28, right: angosto ? 16 : 24, bottom: 46, left: 44 };
 
         const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
         const todos = recorridos.flatMap(r => r.datos);
@@ -942,7 +934,8 @@
         d3.select(contenedor).select("svg").remove();
         const svg = d3.select(contenedor).insert("svg", ".tooltip")
           .attr("viewBox", `0 0 ${ancho} ${alto}`)
-          .attr("role", "img")
+          .attr("role", "group")
+          .attr("aria-describedby", "ayuda-trayectorias resumen-trayectorias")
           .attr("aria-label", "Trayectorias de ingreso y esperanza de vida entre 1990 y 2024 de " + activos.map(a => nombre.get(a.iso3)).join(", "));
 
         svg.append("g").attr("class", "grilla")
@@ -955,9 +948,9 @@
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(8))
           .call(g => g.select(".domain").remove());
-        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
-          .text("PIB por habitante (PPA, escala log) →");
-        svg.append("text").attr("class", "titulo-eje").attr("x", m.left - 36).attr("y", m.top - 2).text("↑ Años de vida");
+        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
+          .text("PIB por habitante (PPA, escala log)");
+        svg.append("text").attr("class", "titulo-eje").attr("x", m.left).attr("y", 14).text("Esperanza de vida (años)");
 
         const plano = svg.append("g").attr("clip-path", null);
         const enRango = d => d.pib >= x.domain()[0] && d.pib <= x.domain()[1] && d.vida >= y.domain()[0] && d.vida <= y.domain()[1];
@@ -1048,27 +1041,56 @@
         const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("r", 6).attr("opacity", 0);
         const objetivos = recorridos.flatMap(r => r.datos.map(d => ({ ...d, iso3: r.iso3 })));
         const delaunay = d3.Delaunay.from(objetivos, d => x(d.pib), d => y(d.vida));
+        const mostrar = d => {
+          anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("opacity", 1);
+          const inicio = porPais.get(d.iso3)[0];
+          tip.mostrar([
+            ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
+            ["PIB por habitante", fmt.dinero(d.pib)],
+            [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
+          ], nombre.get(d.iso3), `Año ${d.anio}`, x(d.pib), y(d.vida), "PIB en PPA · $ internacionales de 2021");
+        };
+        const indiceConsultado = r => Math.max(0, r.datos.findIndex(d => d.anio === anioConsultado.get(r.iso3)));
+        function actualizarControl(nodo, r, indice, mostrarDato = true) {
+          const d = r.datos[indice];
+          anioConsultado.set(r.iso3, d.anio);
+          d3.select(nodo).attr("aria-valuenow", d.anio)
+            .attr("aria-valuetext", `${d.anio}: esperanza de vida ${fmt.coma(fmt.anios(d.vida))} años; PIB por habitante ${fmt.dinero(d.pib)} dólares internacionales de 2021`);
+          if (mostrarDato) mostrar({ ...d, iso3: r.iso3 });
+        }
+        capas.attr("role", "slider").attr("tabindex", 0)
+          .attr("data-pais-teclado", r => r.iso3)
+          .attr("aria-label", r => `Año de la trayectoria de ${nombre.get(r.iso3)}`)
+          .attr("aria-describedby", "ayuda-trayectorias")
+          .attr("aria-orientation", "horizontal")
+          .attr("aria-valuemin", r => r.datos[0].anio)
+          .attr("aria-valuemax", r => r.datos.at(-1).anio)
+          .each(function (r) { actualizarControl(this, r, indiceConsultado(r), false); })
+          .on("focus", function (ev, r) { actualizarControl(this, r, indiceConsultado(r)); })
+          .on("keydown", function (ev, r) {
+            const i = indiceConsultado(r);
+            const siguiente = { ArrowLeft: i - 1, ArrowDown: i - 1, ArrowRight: i + 1, ArrowUp: i + 1, Home: 0, End: r.datos.length - 1 }[ev.key];
+            if (siguiente === undefined) return;
+            ev.preventDefault();
+            actualizarControl(this, r, Math.max(0, Math.min(r.datos.length - 1, siguiente)));
+          });
+        const restaurarFoco = () => {
+          const nodo = capas.nodes().find(n => n === document.activeElement);
+          if (nodo) { const r = d3.select(nodo).datum(); actualizarControl(nodo, r, indiceConsultado(r)); }
+          else anillo.attr("opacity", 0);
+        };
         svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
           .on("pointermove click", ev => {
             if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             if (!objetivos.length) return;
             const [px, py] = d3.pointer(ev);
             const d = objetivos[delaunay.find(px, py)];
-            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 36) { tip.ocultar(); anillo.attr("opacity", 0); return; }
-            anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("opacity", 1);
-            const inicio = porPais.get(d.iso3)[0];
-            tip.mostrar([
-              ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-              ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
-              [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
-            ], nombre.get(d.iso3), `Año ${d.anio}`, x(d.pib), y(d.vida));
+            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 36) { restaurarFoco(); return; }
+            mostrar(d);
           })
-          .on("pointerleave", () => { tip.ocultar(); anillo.attr("opacity", 0); });
-        tip.mostrar([
-          ["Esperanza de vida", "—"],
-          ["PIB por habitante (PPA, $ int. de 2021)", "—"],
-          ["Cambio desde el primer año", "—"],
-        ], activos.length ? "Explorá una trayectoria" : "Elegí un país", activos.length ? "Pasá por un punto o tocalo para ver el año y sus datos." : "Usá los selectores para ver su evolución.");
+          .on("pointerleave", restaurarFoco);
+        tip.mostrar([], activos.length ? "Explorá una trayectoria" : "Elegí un país", activos.length ? "Pasá por un punto o usá Tab y las flechas." : "Usá los selectores para ver su evolución.");
+        if (paisConFoco) capas.nodes().find(n => n.getAttribute("data-pais-teclado") === paisConFoco)?.focus({ preventScroll: true });
       }
 
       dibujar();
