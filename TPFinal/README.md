@@ -15,8 +15,13 @@ El modelo basado en el PIB per cápita da cuenta del 74,4 % de la variación obs
 | `exploracion/` | Notebooks (Colab) de la etapa exploratoria |
 | `datos/` | Datos procesados que usan las visualizaciones |
 | `index.html` | La nota con las tres visualizaciones interactivas (D3) |
+| `vivir_mas_sin_ser_mas_rico.ipynb` | Notebook de entrega para Colab: exploración y los tres gráficos interactivos |
 
 ## Notebooks
+
+**Entrega:** [`vivir_mas_sin_ser_mas_rico.ipynb`](vivir_mas_sin_ser_mas_rico.ipynb) ([abrir en Colab](https://colab.research.google.com/github/za0sec/infovis/blob/main/TPFinal/vivir_mas_sin_ser_mas_rico.ipynb)). Descarga los datos de la API, explora la cobertura de los indicadores y muestra los tres gráficos: PIB por habitante y esperanza de vida (el mismo código que la nota), acceso básico al agua y vacunación contra el sarampión, estos dos con un deslizador de años. Corre con «Ejecutar todo» en una sesión nueva.
+
+Notebooks de trabajo, en `exploracion/`:
 
 1. `01_exploracion_data360.ipynb` — qué bases, indicadores y dimensiones ofrece la API, su cobertura temporal y cómo cambia un mismo indicador entre bases.
 2. `02_datos.ipynb` — descarga y limpieza del panel país–año.
