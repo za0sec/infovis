@@ -36,9 +36,9 @@
       --menos-fuerte: #d03b3b;
       --recta: #52514e;
 
-      --serie-1: #2a78d6;
-      --serie-2: #eb6834;
-      --serie-3: #1baf7a;
+      --serie-1: #2463a6;
+      --serie-2: #9a5b00;
+      --serie-3: #7443a1;
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
@@ -58,9 +58,9 @@
         --menos-suave: #8f3b3b;
         --menos-fuerte: #e66767;
         --recta: #c3c2b7;
-        --serie-1: #3987e5;
-        --serie-2: #d95926;
-        --serie-3: #199e70;
+        --serie-1: #6baaff;
+        --serie-2: #ffb454;
+        --serie-3: #c697f4;
       }
     }
     :root[data-theme="dark"] {
@@ -80,9 +80,9 @@
       --menos-suave: #8f3b3b;
       --menos-fuerte: #e66767;
       --recta: #c3c2b7;
-      --serie-1: #3987e5;
-      --serie-2: #d95926;
-      --serie-3: #199e70;
+      --serie-1: #6baaff;
+      --serie-2: #ffb454;
+      --serie-3: #c697f4;
     }
 
     :is(#fig-dispersion, #fig-ranking) {
@@ -135,7 +135,7 @@
     figure.ancho { margin: 40px auto 48px; }
     .tarjeta { padding: 22px 22px 16px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; }
     .grafico-titulo { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.3; }
-    #fig-dispersion .grafico-titulo { margin: 0; font: 600 19px/1.3 system-ui; }
+    :is(#fig-dispersion, #fig-trayectorias) .grafico-titulo { margin: 0; font: 600 19px/1.3 system-ui; }
     .grafico-sub { margin: 4px 0 14px; color: var(--texto-2); font-size: 15px; line-height: 1.45; }
     figcaption { margin-top: 10px; color: var(--texto-3); font-size: 13px; line-height: 1.5; }
     figcaption a { color: inherit; }
@@ -211,7 +211,7 @@
     .lista li { margin-bottom: .3em; }
     code { font: 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--texto-2); }
     .leyenda i.trazo { width: 16px; height: 0; border-top: 2px solid; border-radius: 0; }
-    .anio { fill: var(--texto-3); font-size: 11px; paint-order: stroke; stroke: var(--superficie); stroke-width: 3px; }
+    #trayectorias .anio { font-size: 11px; }
 
     details.tabla { margin-top: 14px; font-size: 14px; }
     details.tabla summary { cursor: pointer; color: var(--acento); font-weight: 600; }
@@ -322,8 +322,8 @@
 
     <figure class="ancho" id="fig-trayectorias">
       <div class="tarjeta">
-        <p class="grafico-titulo">El camino de cada país, de 1990 a 2024</p>
-        <p class="grafico-sub">Cada punto es un año. Hacia la derecha, el país se enriquece; hacia arriba, vive más. Elegí hasta tres países para comparar.</p>
+        <h2 class="grafico-titulo">¿Cómo cambiaron el ingreso y la esperanza de vida desde 1990?</h2>
+        <p class="grafico-sub">El círculo hueco marca el primer año disponible y el círculo lleno, el último. Las flechas siguen el orden de los años. Podés seguir un país solo o comparar hasta tres.</p>
         <div class="pasos" id="atajos" aria-label="Comparaciones sugeridas"></div>
         <div class="controles" id="selectores"></div>
         <div class="leyenda" id="leyenda-trayectorias"></div>
@@ -335,7 +335,7 @@
 
     <div class="columna">
       <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. El pozo que se ve en casi todas las trayectorias en 2020 y 2021 es la pandemia de COVID-19, de la que la mayoría de los países ya se recuperó.</p>
-      <p>Con los botones de arriba del gráfico se pueden explorar otras historias. <strong>Polonia</strong> y <strong>Rusia</strong> tienen hoy un ingreso por habitante parecido, pero los polacos viven cinco años más. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. <strong>Gabón</strong>, en cambio, es más pobre que en 1990.</p>
+      <p>El botón «China e India» permite comparar dos ritmos de crecimiento. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. Con los selectores podés explorar otros casos. En 2024, <strong>Polonia</strong> y <strong>Rusia</strong> tenían un ingreso por habitante parecido y la esperanza de vida en Polonia era cinco años mayor. El PIB por habitante de <strong>Gabón</strong> era menor que en 1990.</p>
       <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
 
       <h2>Lo que dicen (y lo que no) estos datos</h2>
@@ -775,7 +775,8 @@
     function trayectorias(paises, puntos, modelo) {
       const contenedor = document.getElementById("trayectorias");
       const tip = tooltip(contenedor);
-      const porPais = d3.group(puntos, d => d.iso3);
+      const porPais = d3.group(puntos.filter(d => d.pib > 0 && Number.isFinite(d.vida)), d => d.iso3);
+      for (const serie of porPais.values()) serie.sort((a, b) => a.anio - b.anio);
       const nombre = new Map(paises.map(d => [d.iso3, d.pais]));
       const opciones = paises.filter(d => porPais.has(d.iso3)).sort((a, b) => d3.ascending(a.pais, b.pais));
       const SERIES = ["--serie-1", "--serie-2", "--serie-3"];
@@ -784,13 +785,13 @@
         { nombre: "EE. UU., Costa Rica y Chile", paises: ["USA", "CRI", "CHL"] },
         { nombre: "Argentina y vecinos", paises: ["ARG", "URY", "BRA"] },
         { nombre: "China e India", paises: ["CHN", "IND", ""] },
-        { nombre: "Rusia, Polonia y Ucrania", paises: ["RUS", "POL", "UKR"] },
-        { nombre: "Petróleo", paises: ["NGA", "GNQ", "GAB"] },
+        { nombre: "Ver un solo país" },
       ];
       const atajos = d3.select("#atajos").selectAll("button").data(ATAJOS).join("button")
         .attr("type", "button").text(a => a.nombre)
         .on("click", (ev, a) => {
-          a.paises.forEach((iso3, i) => { elegidos[i] = iso3; });
+          const seleccion = a.paises ?? [elegidos.find(Boolean) ?? "USA", "", ""];
+          seleccion.forEach((iso3, i) => { elegidos[i] = iso3; });
           selects.property("value", (d, i) => elegidos[i]);
           dibujar();
         });
@@ -807,14 +808,17 @@
       selects.property("value", d => d);
 
       function dibujar() {
+        tip.ocultar();
         const activos = elegidos.map((iso3, i) => ({ iso3, color: `var(${SERIES[i]})` })).filter(d => d.iso3);
-        atajos.attr("aria-pressed", a => a.paises.every((iso3, i) => iso3 === elegidos[i]));
+        atajos.attr("aria-pressed", a => a.paises
+          ? a.paises.every((iso3, i) => iso3 === elegidos[i])
+          : activos.length === 1);
 
         // Resumen de cada recorrido: cuánto cambió el ingreso y cuántos años de vida se ganaron
         d3.select("#resumen-trayectorias").selectAll("li").data(activos, d => d.iso3).join("li")
           .call(li => li.selectAll("*").remove())
           .each(function (a) {
-            const serie = porPais.get(a.iso3).filter(d => d.pib && d.vida);
+            const serie = porPais.get(a.iso3);
             const ini = serie[0], fin = serie[serie.length - 1];
             const li = d3.select(this);
             li.append("i").style("border-color", a.color);
@@ -833,7 +837,7 @@
         const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
         const m = { top: 12, right: angosto ? 16 : 24, bottom: 46, left: 44 };
 
-        const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3).filter(d => d.pib && d.vida) }));
+        const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
         const todos = recorridos.flatMap(r => r.datos);
         // En pantallas angostas el encuadre se ajusta a los países elegidos para que las trayectorias se lean mejor
         const xDom = d3.extent(angosto && todos.length ? todos.map(d => d.pib) : [...todos.map(d => d.pib), 2000, 60000]);
@@ -871,39 +875,80 @@
         plano.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
           .attr("fill", "none").attr("stroke", "var(--recta)").attr("stroke-width", 1.5).attr("opacity", .5);
 
-        const linea = d3.line(d => x(d.pib), d => y(d.vida)).curve(d3.curveCatmullRom.alpha(.5));
+        const linea = d3.line(d => x(d.pib), d => y(d.vida));
         const capas = plano.append("g").selectAll("g").data(recorridos).join("g");
-        capas.append("path").attr("d", r => linea(r.datos))
+        capas.append("path").attr("class", "recorrido-anual").attr("d", r => linea(r.datos))
           .attr("fill", "none").attr("stroke", r => r.color).attr("stroke-width", 2)
           .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
         capas.selectAll("circle").data(r => r.datos.map(d => ({ ...d, color: r.color }))).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida))
-          .attr("r", (d, i, n) => i === n.length - 1 ? 5 : 1.8)
-          .attr("fill", d => d.color).attr("stroke", "var(--superficie)").attr("stroke-width", (d, i, n) => i === n.length - 1 ? 2 : 0.8);
+          .attr("r", 1.8).attr("fill", d => d.color)
+          .attr("stroke", "var(--superficie)").attr("stroke-width", 0.8);
 
-        capas.append("text").attr("class", "anio")
-          .attr("x", r => x(r.datos[0].pib)).attr("y", r => y(r.datos[0].vida) + 15).attr("text-anchor", "middle")
-          .text(r => r.datos[0].anio);
-        capas.append("text").attr("class", "etiqueta")
-          .each(function (r) {
-            const ultimo = r.datos[r.datos.length - 1];
-            const izquierda = x(ultimo.pib) > ancho - m.right - 100;
-            d3.select(this).attr("x", x(ultimo.pib) + (izquierda ? -9 : 9)).attr("y", y(ultimo.vida) - 8)
-              .attr("text-anchor", izquierda ? "end" : "start").text(nombre.get(r.iso3));
+        // Una flecha por período, situada en el tramo anual con más espacio.
+        capas.each(function (r) {
+          const tramos = d3.pairs(r.datos).map(([desde, hasta]) => {
+            const dx = x(hasta.pib) - x(desde.pib);
+            const dy = y(hasta.vida) - y(desde.vida);
+            return { desde, hasta, dx, dy, largo: Math.hypot(dx, dy) };
           });
-        // Las etiquetas se ubican de arriba hacia abajo; si una pisa a otra, pasa debajo de su punto y, si hace falta, al otro lado
-        const ocupadas = [];
-        const choca = c => ocupadas.some(o => c.x < o.x + o.width && o.x < c.x + c.width && c.y < o.y + o.height && o.y < c.y + c.height);
-        const etiquetas = capas.select("text.etiqueta").nodes()
-          .sort((p, q) => d3.select(p).datum().datos.at(-1).vida < d3.select(q).datum().datos.at(-1).vida ? 1 : -1);
-        for (const nodo of etiquetas) {
-          const t = d3.select(nodo), ultimo = t.datum().datos.at(-1);
-          if (choca(nodo.getBBox())) t.attr("y", y(ultimo.vida) + 18);
-          if (choca(nodo.getBBox())) {
-            const aDerecha = t.attr("text-anchor") === "end";
-            t.attr("x", x(ultimo.pib) + (aDerecha ? 9 : -9)).attr("text-anchor", aDerecha ? "start" : "end");
+          for (const [desde, hasta] of [[2019, 2021], [2021, Infinity]]) {
+            const tramo = d3.greatest(tramos.filter(t => t.desde.anio >= desde && t.hasta.anio <= hasta), t => t.largo);
+            if (!tramo || tramo.largo < 8) continue;
+            const { dx, dy } = tramo;
+            const cx = x(tramo.desde.pib) + dx / 2;
+            const cy = y(tramo.desde.vida) + dy / 2;
+            const giro = Math.atan2(dy, dx) * 180 / Math.PI;
+            d3.select(this).append("path").attr("class", "flecha-tiempo")
+              .attr("d", "M5,0L-4,-3.5L-4,3.5Z")
+              .attr("transform", `translate(${cx},${cy}) rotate(${giro})`)
+              .attr("fill", r.color).attr("stroke", "var(--superficie)").attr("stroke-width", 1);
           }
-          ocupadas.push(nodo.getBBox());
+        });
+
+        const extremos = recorridos.flatMap(r => {
+          const inicio = r.datos[0], fin = r.datos.at(-1);
+          return inicio === fin
+            ? [{ d: fin, serie: r, final: true }]
+            : [{ d: inicio, serie: r, final: false }, { d: fin, serie: r, final: true }];
+        });
+        plano.append("g").selectAll("circle").data(extremos).join("circle")
+          .attr("class", e => e.final ? "fin-trayectoria" : "inicio-trayectoria")
+          .attr("cx", e => x(e.d.pib)).attr("cy", e => y(e.d.vida)).attr("r", 4.5)
+          .attr("fill", e => e.final ? e.serie.color : "var(--superficie)")
+          .attr("stroke", e => e.final ? "var(--superficie)" : e.serie.color).attr("stroke-width", 1.8);
+
+        const fechas = recorridos.filter(r => r.iso3 === "USA").flatMap(r =>
+          r.datos.slice(1, -1).filter(d => d.anio === 2019 || d.anio === 2021)
+            .map(d => ({ d, intermedia: true }))
+        );
+        const etiquetas = [...extremos.filter(e => e.final), ...extremos.filter(e => !e.final), ...fechas];
+        const ocupadas = extremos.map(({ d }) => ({ x: x(d.pib) - 5, y: y(d.vida) - 5, width: 10, height: 10 }));
+        const choca = caja => ocupadas.some(o => caja.x < o.x + o.width + 2 && o.x < caja.x + caja.width + 2 &&
+          caja.y < o.y + o.height + 2 && o.y < caja.y + caja.height + 2);
+        const capaEtiquetas = plano.append("g");
+        for (const { d, serie, final, intermedia } of etiquetas) {
+          const cx = x(d.pib), cy = y(d.vida);
+          const etiqueta = capaEtiquetas.append("text")
+            .attr("class", final ? "etiqueta anio-fin" : "etiqueta anio")
+            .attr("y", 0)
+            .text(final ? `${nombre.get(serie.iso3)} · ${d.anio}` : d.anio);
+          const medida = etiqueta.node().getBBox();
+          const posiciones = final ? [[9, -9], [-9, -9], [9, 16], [-9, 16]] : [[0, 17], [0, -9], [12, 2], [-12, 2]];
+          let ubicada = false;
+          for (const [dx, dy] of posiciones) {
+            const izquierda = Math.max(2, Math.min(ancho - medida.width - 2,
+              cx + dx - (dx < 0 ? medida.width : dx === 0 ? medida.width / 2 : 0)));
+            const caja = { x: izquierda, y: cy + dy + medida.y, width: medida.width, height: medida.height };
+            if (caja.y < m.top || caja.y + caja.height > alto - m.bottom || choca(caja)) continue;
+            etiqueta.attr("x", izquierda).attr("y", cy + dy);
+            ocupadas.push(caja);
+            ubicada = true;
+            break;
+          }
+          if (!ubicada && intermedia) etiqueta.remove();
+          else if (!ubicada) etiqueta.attr("x", Math.max(2, Math.min(ancho - medida.width - 2, cx - medida.width / 2)))
+            .attr("y", cy + (final ? -9 : 17));
         }
 
         const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("r", 6).attr("opacity", 0);
@@ -916,7 +961,7 @@
             const d = objetivos[delaunay.find(px, py)];
             if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 36) { tip.ocultar(); anillo.attr("opacity", 0); return; }
             anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("opacity", 1);
-            const inicio = porPais.get(d.iso3).find(p => p.pib && p.vida);
+            const inicio = porPais.get(d.iso3)[0];
             tip.mostrar([
               ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
               ["PIB por habitante (PPA)", fmt.dinero(d.pib) + " $ int. de 2021"],
