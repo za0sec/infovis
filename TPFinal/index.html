@@ -188,7 +188,7 @@
     .eje line, .eje path { stroke: var(--eje); }
     .eje .domain, .eje-referencia { stroke: var(--texto-3); stroke-width: 1.2; }
     .grilla line { stroke: var(--grilla); }
-    .titulo-eje { fill: var(--texto-2); font-size: 12px; }
+    .titulo-eje { fill: var(--texto-2); font-size: 12px; font-weight: 700; }
     .etiqueta { fill: var(--texto); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
     .etiqueta.suave { fill: var(--texto-2); font-weight: 400; }
 
@@ -625,7 +625,7 @@
         const angosto = ancho < 560;
         const alto = Math.round(Math.max(340, Math.min(560, ancho * 0.58)));
         const actual = paso === null ? null : PASOS[paso];
-        const m = { top: 24, right: 14, bottom: 46, left: 60 };
+        const m = { top: 24, right: 14, bottom: 46, left: 44 };
 
         const x = d3.scaleLog().domain([700, 150000]).range([m.left, ancho - m.right]).clamp(true);
         const y = d3.scaleLinear().domain([50, 88]).range([alto - m.bottom, m.top]);
@@ -647,10 +647,10 @@
             .tickFormat(v => v >= 1000 ? (v / 1000) + " mil" : v).tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
-        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
+        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
-          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
+        svg.append("text").attr("class", "titulo-eje")
+          .attr("x", m.left + 4).attr("y", m.top - 8)
           .text("Esperanza de vida (años)");
 
         const curva = d3.range(Math.log(700), Math.log(150000), 0.05).map(l => [Math.exp(l), modelo.a + modelo.b * l]);
@@ -659,17 +659,18 @@
           .attr("stroke-width", paso === 0 ? 2.5 : 1.5).attr("opacity", paso === 0 ? 1 : .7);
 
         const filtro = region.value;
-        const visibles = filtro ? paises.filter(d => d.region === filtro) : paises;
-        const activo = actual ? actual.activo : d => !seleccion || d.iso3 === seleccion.iso3;
+        const visibles = filtro ? paises.filter(d => d.region === filtro)
+          : actual ? paises.filter(actual.activo) : paises;
+        const filtrado = Boolean(filtro) || (paso !== null && paso !== 0);
 
         svg.append("g").selectAll("circle").data(visibles).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
           .attr("fill", colorBrecha)
-          .attr("fill-opacity", d => activo(d) ? .88 : .12);
+          .attr("fill-opacity", d => !seleccion || d.iso3 === seleccion.iso3 ? .88 : .12);
 
         const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
         const etiquetados = seleccion ? [seleccion]
-          : actual?.etiquetas ? Object.keys(posiciones).map(iso3 => paises.find(d => d.iso3 === iso3)).filter(Boolean)
+          : actual?.etiquetas ? Object.keys(posiciones).map(iso3 => visibles.find(d => d.iso3 === iso3)).filter(Boolean)
           : visibles.filter(d => (filtro ? Math.abs(d.brecha) >= 3 : d.iso3 in DESTACADOS))
               .filter(d => !angosto || d.iso3 in DESTACADOS_MOVIL || filtro);
         const ocupadas = [];
@@ -722,14 +723,14 @@
           .on("pointermove click", ev => {
             if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             const [px, py] = d3.pointer(ev);
-            if (ev.type === "click" && filtro) {
+            if (ev.type === "click" && filtrado) {
               const pulsado = visibles.findLast(d => Math.hypot(x(d.pib) - px, y(d.vida) - py) <= radio(d));
               if (pulsado) mostrar(pulsado);
-              else { region.value = ""; cambiarRegion(); }
+              else irAPaso(0);
               return;
             }
             const d = visibles[delaunay.find(px, py)];
-            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { restaurarFicha(); return; }
+            if (!d || Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { restaurarFicha(); return; }
             mostrar(d);
           })
           .on("pointerleave", ev => { if (ev.pointerType !== "touch") restaurarFicha(); });
@@ -969,7 +970,7 @@
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
         const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
-        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 60 };
+        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 44 };
 
         const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
         const todos = recorridos.flatMap(r => r.datos);
@@ -994,10 +995,10 @@
           .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0));
         svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
           .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
-        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
+        svg.append("text").attr("class", "titulo-eje").attr("x", ancho - m.right).attr("y", alto - 8).attr("text-anchor", "end")
           .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
-          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
+        svg.append("text").attr("class", "titulo-eje")
+          .attr("x", m.left + 4).attr("y", m.top - 8)
           .text("Esperanza de vida (años)");
 
         const plano = svg.append("g").attr("clip-path", null);
