@@ -85,7 +85,7 @@
       --serie-3: #199e70;
     }
 
-    #fig-dispersion {
+    :is(#fig-dispersion, #fig-ranking) {
       --mas-fuerte: #194b87;
       --mas-suave: #397ba7;
       --neutro: #8d782c;
@@ -94,7 +94,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) #fig-dispersion {
+      :root:not([data-theme="light"]) :is(#fig-dispersion, #fig-ranking) {
         --mas-fuerte: #91bfdb;
         --mas-suave: #5585a3;
         --neutro: #ded48f;
@@ -103,7 +103,7 @@
       }
     }
 
-    :root[data-theme="dark"] #fig-dispersion {
+    :root[data-theme="dark"] :is(#fig-dispersion, #fig-ranking) {
       --mas-fuerte: #91bfdb;
       --mas-suave: #5585a3;
       --neutro: #ded48f;
@@ -200,7 +200,6 @@
     .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
     .nombre-fila { fill: var(--texto); font-size: 13px; }
     .nombre-fila.argentina { font-weight: 700; }
-    .fila-argentina path { fill: var(--neutro); }
     .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
     .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
 
@@ -290,19 +289,20 @@
     <figure class="ancho" id="fig-ranking">
       <div class="tarjeta">
         <p class="grafico-titulo">¿Cuántos años de más o de menos vive cada país?</p>
-        <p class="grafico-sub">Diferencia entre la esperanza de vida real y la que predice su ingreso por habitante, en años. Los 12 países más por encima y los 12 más por debajo de lo esperado.</p>
+        <p class="grafico-sub">Diferencia, en años, entre la esperanza de vida observada y la que estima el modelo según el PIB por habitante. <span id="resumen-ranking" aria-live="polite"></span></p>
         <div class="controles">
-          <label>Región
+          <label>Región del Banco Mundial
             <select id="region-ranking">
               <option value="">Todas</option>
             </select>
           </label>
           <label><input type="checkbox" id="chicos"> Incluir países de menos de 1 millón de habitantes</label>
         </div>
+        <div class="leyenda" id="leyenda-ranking"></div>
         <div class="lienzo" id="ranking"><div class="tooltip" role="status"></div></div>
         <p class="nota-grafico" id="nota-argentina"></p>
         <details class="tabla">
-          <summary>Ver todos los países en una tabla</summary>
+          <summary id="resumen-tabla-ranking">Ver las economías del filtro en una tabla</summary>
           <div class="tabla-scroll"><table id="tabla"></table></div>
         </details>
       </div>
@@ -384,6 +384,15 @@
       { min: -Infinity, nombre: "4 años o más por debajo", token: "--menos-fuerte" },
     ];
     const claseDe = brecha => CLASES.find(c => brecha >= c.min);
+    const colorBrecha = d => `var(${claseDe(d.brecha).token})`;
+
+    function leyendaBrechas(selector) {
+      const leyenda = d3.select(selector);
+      leyenda.selectAll("span").data(CLASES).join("span")
+        .call(s => s.append("i").style("background", c => `var(${c.token})`))
+        .call(s => s.append("span").text(c => c.nombre));
+      return leyenda;
+    }
 
     function tooltip(contenedor) {
       const el = contenedor.querySelector(".tooltip");
@@ -431,7 +440,6 @@
       document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
       dispersion(paises, modelo);
       ranking(paises);
-      tabla(paises);
       d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
     });
 
@@ -450,10 +458,7 @@
       d3.select(region).selectAll("option.r").data([...new Set(paises.map(d => d.region))].sort(d3.ascending))
         .join("option").attr("class", "r").attr("value", d => d).text(d => d);
 
-      const leyenda = d3.select("#leyenda-brecha");
-      leyenda.selectAll("span").data(CLASES).join("span")
-        .call(s => s.append("i").style("background", c => `var(${c.token})`))
-        .call(s => s.append("span").text(c => c.nombre));
+      const leyenda = leyendaBrechas("#leyenda-brecha");
       leyenda.append("span").call(s => s.append("i").attr("class", "linea"))
         .call(s => s.append("span").text("Esperada según el ingreso"));
 
@@ -543,7 +548,7 @@
 
         svg.append("g").selectAll("circle").data(paises).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
-          .attr("fill", d => `var(${claseDe(d.brecha).token})`)
+          .attr("fill", colorBrecha)
           .attr("fill-opacity", d => activo(d) ? .88 : .12);
 
         const posiciones = actual?.etiquetas ? (angosto ? actual.movil : actual.etiquetas) : (angosto && !filtro ? DESTACADOS_MOVIL : DESTACADOS);
@@ -625,7 +630,11 @@
       const tip = tooltip(contenedor);
       const region = document.getElementById("region-ranking");
       const chicos = document.getElementById("chicos");
+      const resumen = document.getElementById("resumen-ranking");
+      const resumenTabla = document.getElementById("resumen-tabla-ranking");
+      const actualizarTabla = tabla();
       const N = 12;
+      leyendaBrechas("#leyenda-ranking");
 
       d3.select(region).selectAll("option.r").data([...new Set(paises.map(d => d.region))].sort(d3.ascending))
         .join("option").attr("class", "r").attr("value", d => d).text(d => d);
@@ -652,11 +661,20 @@
         const i = universo.findIndex(d => d.iso3 === "ARG");
         if (i < 0) { el.textContent = ""; return; }
         const arg = universo[i];
-        el.textContent = `Argentina (destacada en el medio): ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length}. Prácticamente sobre la línea.`;
+        el.textContent = `Argentina: ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length} con los filtros actuales.`;
       }
 
       function dibujar() {
         const { universo, recorte, huecos } = filas();
+        tip.ocultar();
+        const cantidad = universo.length === 1 ? "1 economía" : `${universo.length} economías`;
+        const alcance = region.value ? ` en ${region.value}` : "";
+        const referencia = recorte.length > N * 2 ? ", con Argentina como referencia" : "";
+        resumen.textContent = universo.length > N * 2
+          ? `De las ${cantidad}${alcance}, se muestran las ${N} brechas más altas y las ${N} más bajas${referencia}.`
+          : `Se muestran ${cantidad}${alcance}.`;
+        resumenTabla.textContent = `Ver ${cantidad} con estos filtros en una tabla`;
+        actualizarTabla(universo);
         nota(universo);
         const ancho = contenedor.clientWidth;
         const angosto = ancho < 560;
@@ -666,7 +684,7 @@
         const yDe = i => m.top + i * fila + hueco * huecos.filter(h => i >= h.en).length;
 
         const x = d3.scaleLinear()
-          .domain([Math.min(-2, d3.min(recorte, d => d.brecha)), Math.max(2, d3.max(recorte, d => d.brecha))])
+          .domain([Math.min(-2, d3.min(recorte, d => d.brecha) ?? 0), Math.max(2, d3.max(recorte, d => d.brecha) ?? 0)])
           .range([m.left + (angosto ? 34 : 44), ancho - m.right]).nice();
 
         d3.select(contenedor).select("svg").remove();
@@ -694,10 +712,8 @@
           const s = Math.sign(x1 - x0) || 1;
           return `M${x0},${y0}H${x1 - s * r}Q${x1},${y0} ${x1},${y0 + r}V${y0 + alto_barra - r}Q${x1},${y0 + alto_barra} ${x1 - s * r},${y0 + alto_barra}H${x0}Z`;
         };
-        const color = d => d.brecha >= 0 ? "var(--mas-fuerte)" : "var(--menos-fuerte)";
-
-        const g = svg.append("g").selectAll("g").data(recorte).join("g").attr("class", d => d.iso3 === "ARG" ? "fila-argentina" : null);
-        g.append("path").attr("d", barra).attr("fill", color);
+        const g = svg.append("g").selectAll("g").data(recorte).join("g");
+        g.append("path").attr("d", barra).attr("fill", colorBrecha);
         g.append("text").attr("class", d => "nombre-fila" + (d.iso3 === "ARG" ? " argentina" : ""))
           .attr("x", m.left - 8).attr("y", (d, i) => yDe(i) + fila / 2 + 4).attr("text-anchor", "end")
           .text(d => d.pais.length > 14 && angosto ? d.pais.slice(0, 13) + "…" : d.pais);
@@ -729,7 +745,7 @@
       redibujarAlCambiarAncho(contenedor, dibujar);
     }
 
-    function tabla(paises) {
+    function tabla() {
       const columnas = [
         { clave: "pais", titulo: "País", texto: d => d.pais },
         { clave: "vida", titulo: "Esperanza de vida", texto: d => fmt.coma(fmt.anios(d.vida)) },
@@ -739,6 +755,7 @@
         { clave: "gasto_salud", titulo: "Gasto en salud por hab. (PPA, $ int. corrientes)", texto: d => d.gasto_salud != null ? `${fmt.dinero(d.gasto_salud)} (${d.anio_gasto})` : "s/d" },
       ];
       const t = d3.select("#tabla");
+      let paises = [];
       let orden = { clave: "brecha", asc: false };
       const encabezado = t.append("thead").append("tr").selectAll("th").data(columnas).join("th")
         .attr("scope", "col").text(c => c.titulo)
@@ -750,7 +767,10 @@
         cuerpo.selectAll("tr").data(datos, d => d.iso3).join("tr").order()
           .selectAll("td").data(d => columnas.map(c => c.texto(d))).join("td").text(v => v);
       }
-      pintar();
+      return universo => {
+        paises = universo;
+        pintar();
+      };
     }
     function trayectorias(paises, puntos, modelo) {
       const contenedor = document.getElementById("trayectorias");
