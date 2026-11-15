@@ -25,7 +25,7 @@ Notebooks de trabajo, en `exploracion/`:
 
 1. `01_exploracion_data360.ipynb` — qué bases, indicadores y dimensiones ofrece la API, su cobertura temporal y cómo cambia un mismo indicador entre bases.
 2. `02_datos.ipynb` — descarga y limpieza del panel país–año.
-3. `03_analisis.ipynb` — curva ingreso–esperanza de vida, brecha por país, robustez del modelo, mortalidad de menores de 5 años, diferencias por sexo, gasto en salud y trayectorias.
+3. `03_analisis.ipynb` — curva de PIB por habitante y esperanza de vida, brecha por país, robustez del modelo, mortalidad de menores de 5 años, diferencias por sexo, gasto en salud y trayectorias.
 
 ## Cómo correr los notebooks
 
@@ -54,5 +54,5 @@ python3 -m http.server
 ## Hallazgos principales
 
 - En 2024, Costa Rica tenía 2,1 años más de esperanza de vida que Estados Unidos con el 36 % de su PIB por habitante.
-- En 2024, Nigeria y Camboya tenían cerca de 83 % de acceso básico al agua y aproximadamente 16 años de diferencia en esperanza de vida.
+- En 2024, el 82,2 % de la población de Nigeria y el 82,8 % de la de Camboya usaban al menos un servicio básico de agua potable. Los separaban 16,2 años de esperanza de vida.
 - En 2023, Nigeria y Bangladés tenían exposiciones a PM2,5 de 65,7 y 69,3 µg/m³ y aproximadamente 20 años de diferencia en esperanza de vida.
