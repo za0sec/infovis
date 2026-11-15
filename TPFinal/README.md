@@ -14,7 +14,7 @@ La nota compara el PIB por habitante, el acceso básico al agua y la exposición
 |---|---|
 | `exploracion/` | Notebooks (Colab) de la etapa exploratoria |
 | `datos/` | Datos procesados que usan las visualizaciones |
-| `index.html` | La nota con las tres visualizaciones interactivas (D3) |
+| `index.html` | La nota con las tres visualizaciones interactivas del notebook del Grupo 3 |
 | `vivir_mas_sin_ser_mas_rico.ipynb` | Notebook de entrega para Colab: exploración y los tres gráficos interactivos |
 
 ## Notebooks
@@ -38,13 +38,13 @@ jupyter lab TPFinal/exploracion
 
 ## Visualizaciones
 
-1. **PIB por habitante y esperanza de vida (2024).** Dispersión con escala logarítmica para el PIB, área proporcional a la población y color según la distancia al modelo. Incluye búsqueda, región y filtros de brecha.
-2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión con selector de año y de economía. La misma figura permite acercar el tramo del 90 % al 100 %.
-3. **Exposición a PM2,5 y esperanza de vida (2000–2023).** Dispersión con selector de año y de economía, centrada en la comparación entre Nigeria y Bangladés.
+1. **PIB por habitante y esperanza de vida (2024).** Dispersión con eje del PIB lineal, curva de estimación y controles de región, brecha y búsqueda.
+2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión por región con año y búsqueda. Incluye la vista de detalle del 90 % al 100 % del notebook.
+3. **Exposición a PM2,5 y esperanza de vida (2000–2023).** Mapa de exposición y dispersión enlazados por país, con selector de año.
 
-La nota usa los datos guardados en el repositorio. El CSV de agua y aire se extrajo de los datos embebidos en las visualizaciones del notebook del Grupo 3. El navegador carga D3 por CDN y consulta los CSV del sitio.
+La nota incrusta las salidas Altair guardadas en `TPFinal_InfoVis_Grupo_3.ipynb` (celdas 20, 24, 25 y 29). `datos/graficos_grupo3.json` conserva las especificaciones Vega-Lite, los datos y las opciones de esas salidas. La nota usa Vega por CDN y el mapa carga las geometrías de World Atlas que referencia el notebook.
 
-Para verla localmente hay que servir la carpeta (los datos se cargan con `fetch`):
+Para verla localmente, iniciá un servidor desde la raíz del repositorio.
 
 ```bash
 python3 -m http.server
