@@ -13,13 +13,13 @@ La nota compara el PIB por habitante, el acceso básico al agua y la exposición
 | Carpeta | Contenido |
 |---|---|
 | `exploracion/` | Notebooks (Colab) de la etapa exploratoria |
-| `datos/` | Datos procesados que usan las visualizaciones |
+| `datos/` | Datos y resultados de la etapa exploratoria |
 | `index.html` | La nota con las tres visualizaciones interactivas del notebook del Grupo 3 |
-| `vivir_mas_sin_ser_mas_rico.ipynb` | Notebook de entrega para Colab: exploración y los tres gráficos interactivos |
+| `TPFinal_InfoVis_Grupo_3.ipynb` | Notebook de entrega para Colab: exploración y los tres gráficos interactivos |
 
 ## Notebooks
 
-**Entrega:** [`vivir_mas_sin_ser_mas_rico.ipynb`](vivir_mas_sin_ser_mas_rico.ipynb) ([abrir en Colab](https://colab.research.google.com/github/za0sec/infovis/blob/main/TPFinal/vivir_mas_sin_ser_mas_rico.ipynb)). Explora el catálogo de Data360, descarga los datos de la API, analiza la cobertura de los indicadores y arma con Altair los tres gráficos: PIB por habitante y esperanza de vida, acceso básico al agua potable y exposición a partículas finas PM2,5. El gráfico de PIB tiene un deslizador de 1990 a 2024 y ajusta el modelo para cada año. Las vistas de agua potable y el mapa de PM2,5 también tienen un deslizador de años. Corre con «Ejecutar todo» en una sesión nueva.
+**Entrega:** [`TPFinal_InfoVis_Grupo_3.ipynb`](TPFinal_InfoVis_Grupo_3.ipynb) ([abrir en Colab](https://colab.research.google.com/github/za0sec/infovis/blob/main/TPFinal/TPFinal_InfoVis_Grupo_3.ipynb)). Explora el catálogo de Data360, descarga los datos de la API, analiza la cobertura de los indicadores y arma con Altair los tres gráficos: PIB por habitante y esperanza de vida, acceso básico al agua potable y exposición a partículas finas PM2,5. Los tres gráficos permiten cambiar el año.
 
 Notebooks de trabajo, en `exploracion/`:
 
@@ -38,11 +38,11 @@ jupyter lab TPFinal/exploracion
 
 ## Visualizaciones
 
-1. **PIB por habitante y esperanza de vida (2024).** Dispersión con eje del PIB lineal, curva de estimación y controles de región, brecha y búsqueda.
-2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión por región con año y búsqueda. Incluye la vista de detalle del 90 % al 100 % del notebook.
+1. **PIB por habitante y esperanza de vida (1990–2024).** Dispersión coloreada por continente con controles de año, región y búsqueda.
+2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión coloreada por continente con controles de año y búsqueda. Al buscar un país se muestra su recorrido.
 3. **Exposición a PM2,5 y esperanza de vida (2000–2023).** Mapa de exposición y dispersión enlazados por país, con selector de año.
 
-La nota incrusta las salidas Altair guardadas en `TPFinal_InfoVis_Grupo_3.ipynb` (celdas 20, 24, 25 y 29). `datos/graficos_colab.json` es una copia de las especificaciones Vega-Lite, los datos y las opciones de esas salidas, que también están incrustadas en `index.html`. La nota usa Vega por CDN y el mapa carga las geometrías de World Atlas que referencia el notebook.
+`index.html` incrusta las salidas Altair guardadas en `TPFinal_InfoVis_Grupo_3.ipynb` (celdas 20, 24 y 28). La nota usa Vega por CDN y el mapa carga las geometrías de World Atlas que referencia el notebook.
 
 Para verla localmente, iniciá un servidor desde la raíz del repositorio.
 
@@ -53,6 +53,6 @@ python3 -m http.server
 
 ## Hallazgos principales
 
-- En 2024, Costa Rica tenía 2,1 años más de esperanza de vida que Estados Unidos con el 36 % de su PIB por habitante. El ajuste de 2024 da cuenta del 74,4 % de la variación observada entre las 195 economías incluidas.
+- En 2024, Costa Rica tenía 2,1 años más de esperanza de vida que Estados Unidos con el 36 % de su PIB por habitante.
 - En 2024, Nigeria y Camboya tenían cerca de 83 % de acceso básico al agua y aproximadamente 16 años de diferencia en esperanza de vida.
 - En 2023, Nigeria y Bangladés tenían exposiciones a PM2,5 de 65,7 y 69,3 µg/m³ y aproximadamente 20 años de diferencia en esperanza de vida.
