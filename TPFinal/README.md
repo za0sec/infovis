@@ -38,7 +38,7 @@ jupyter lab TPFinal/exploracion
 
 ## Visualizaciones
 
-1. **PIB por habitante y esperanza de vida (1990–2024).** Dispersión coloreada por continente con controles de año, región y búsqueda.
+1. **PIB por habitante y esperanza de vida (1990–2024).** Dispersión por continente con una curva ajustada para cada año. La búsqueda destaca una economía y su ficha muestra la esperanza de vida observada, la estimada y la diferencia. El filtro regional conserva la curva de todas las economías con datos del año.
 2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión coloreada por continente con controles de año y búsqueda. Al buscar un país se muestra su recorrido.
 3. **Exposición a PM2,5 y esperanza de vida (2000–2023).** Mapa de exposición y dispersión enlazados por país, con selector de año.
 
