@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vivir más sin ser más rico</title>
-  <meta name="description" content="Qué países viven más (y menos) de lo que predice su ingreso. Datos del Banco Mundial (Data360).">
+  <meta name="description" content="Tres comparaciones sobre esperanza de vida, PIB por habitante, agua potable y partículas finas. Datos del Banco Mundial, vía Data360.">
   <meta name="author" content="Javier Peral Belmont, Pilar Frutos">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Vivir más sin ser más rico">
-  <meta property="og:description" content="¿Qué países tienen una esperanza de vida mayor o menor que la estimada según su PIB por habitante?">
+  <meta property="og:description" content="Costa Rica vive más que Estados Unidos con el 36 % de su PIB por habitante. ¿Qué muestran el ingreso, el agua y el aire cuando comparamos países?">
   <meta property="og:url" content="https://za0sec.github.io/infovis/TPFinal/">
   <meta property="og:locale" content="es_AR">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='9' cy='22' r='5' fill='%23d03b3b'/%3E%3Ccircle cx='21' cy='10' r='7' fill='%23256abf'/%3E%3C/svg%3E">
@@ -23,7 +23,7 @@
       --superficie: #fcfcfb;
       --texto: #0b0b0b;
       --texto-2: #52514e;
-      --texto-3: #898781;
+      --texto-3: #6b6962;
       --grilla: #e1e0d9;
       --eje: #c3c2b7;
       --borde: rgba(11, 11, 11, .10);
@@ -36,9 +36,6 @@
       --menos-fuerte: #d03b3b;
       --recta: #52514e;
 
-      --serie-1: #2463a6;
-      --serie-2: #9a5b00;
-      --serie-3: #7443a1;
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
@@ -47,7 +44,7 @@
         --superficie: #1a1a19;
         --texto: #f0efec;
         --texto-2: #c3c2b7;
-        --texto-3: #898781;
+        --texto-3: #a5a399;
         --grilla: #2c2c2a;
         --eje: #383835;
         --borde: rgba(255, 255, 255, .10);
@@ -58,9 +55,6 @@
         --menos-suave: #8f3b3b;
         --menos-fuerte: #e66767;
         --recta: #c3c2b7;
-        --serie-1: #6baaff;
-        --serie-2: #ffb454;
-        --serie-3: #c697f4;
       }
     }
     :root[data-theme="dark"] {
@@ -69,7 +63,7 @@
       --superficie: #1a1a19;
       --texto: #f0efec;
       --texto-2: #c3c2b7;
-      --texto-3: #898781;
+      --texto-3: #a5a399;
       --grilla: #2c2c2a;
       --eje: #383835;
       --borde: rgba(255, 255, 255, .10);
@@ -80,12 +74,9 @@
       --menos-suave: #8f3b3b;
       --menos-fuerte: #e66767;
       --recta: #c3c2b7;
-      --serie-1: #6baaff;
-      --serie-2: #ffb454;
-      --serie-3: #c697f4;
     }
 
-    :is(#fig-dispersion, #fig-ranking) {
+    #fig-dispersion {
       --mas-fuerte: #194b87;
       --mas-suave: #397ba7;
       --neutro: #8d782c;
@@ -94,7 +85,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) :is(#fig-dispersion, #fig-ranking) {
+      :root:not([data-theme="light"]) #fig-dispersion {
         --mas-fuerte: #91bfdb;
         --mas-suave: #5585a3;
         --neutro: #ded48f;
@@ -103,7 +94,7 @@
       }
     }
 
-    :root[data-theme="dark"] :is(#fig-dispersion, #fig-ranking) {
+    :root[data-theme="dark"] #fig-dispersion {
       --mas-fuerte: #91bfdb;
       --mas-suave: #5585a3;
       --neutro: #ded48f;
@@ -136,8 +127,7 @@
 
     figure.ancho { margin: 40px auto 48px; }
     .tarjeta { padding: 22px 22px 16px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; }
-    .grafico-titulo { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.3; }
-    :is(#fig-dispersion, #fig-trayectorias) .grafico-titulo { margin: 0; font: 600 19px/1.3 system-ui; }
+    article .grafico-titulo { margin: 0; font: 600 19px/1.3 system-ui; }
     .grafico-sub { margin: 4px 0 14px; color: var(--texto-2); font-size: 15px; line-height: 1.45; }
     figcaption { margin-top: 10px; color: var(--texto-3); font-size: 13px; line-height: 1.5; }
     figcaption a { color: inherit; }
@@ -153,9 +143,6 @@
     .pasos button:hover { border-color: var(--texto-3); color: var(--texto); }
     .pasos button[aria-pressed="true"] { border-color: var(--texto); background: var(--texto); color: var(--superficie); }
     .pasos button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
-    #trayectorias [role="slider"]:focus { outline: none; }
-    #trayectorias [role="slider"]:focus-visible .recorrido-anual { stroke-width: 3.5; }
-    .ayuda-teclado { margin: 0 0 10px; color: var(--texto-2); font-size: 13px; }
     #pasos { gap: 8px; }
     #pasos button {
       display: inline-flex; align-items: center; gap: 8px;
@@ -182,64 +169,42 @@
     .leyenda i { width: 10px; height: 10px; border-radius: 50%; }
     .leyenda i.linea { width: 16px; height: 0; border-top: 1.5px solid var(--recta); border-radius: 0; }
 
-    .lienzo { position: relative; }
+    .lienzo { position: relative; overflow: clip; }
     .lienzo svg { display: block; width: 100%; height: auto; overflow: visible; }
     .eje text { fill: var(--texto-3); font-size: 12px; font-variant-numeric: tabular-nums; }
     .eje line, .eje path { stroke: var(--eje); }
-    .eje .domain, .eje-referencia { stroke: var(--texto-3); stroke-width: 1.2; }
+    .eje .domain { stroke: var(--texto-3); stroke-width: 1.2; }
     .grilla line { stroke: var(--grilla); }
     .titulo-eje { fill: var(--texto-2); font-size: 12px; font-weight: 700; }
     .etiqueta { fill: var(--texto); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--superficie); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
-    .etiqueta.suave { fill: var(--texto-2); font-weight: 400; }
 
     .tooltip { position: absolute; z-index: 5; min-width: min(190px, 100%); max-width: 100%; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, .14); font-size: 13px; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity .12s; }
-    .tooltip.visible { opacity: 1; }
     .tooltip .t-pais { font-size: 14px; font-weight: 600; }
-    .tooltip .t-region { margin-bottom: 6px; color: var(--texto-3); font-size: 12px; }
     .tooltip dl { display: grid; grid-template-columns: auto auto; gap: 1px 14px; margin: 0; }
     .tooltip dt { color: var(--texto-2); }
     .tooltip dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-    :is(#dispersion, #ranking, #trayectorias) .tooltip { position: static; opacity: 1; width: 280px; min-width: 0; max-width: 100%; margin: 10px 0 0 auto; padding: 10px 12px; box-shadow: none; }
-    #ranking .ficha-ranking.interior { position: absolute; right: 0; bottom: 16px; margin: 0; }
-    #ranking .ficha-ranking { width: 250px; }
-    #trayectorias .ficha-ranking.interior { position: absolute; right: 14px; bottom: 60px; margin: 0; }
-    .tooltip .t-region, .ficha-pais .t-contexto { margin: 2px 0 7px; color: var(--texto-2); font-size: 12px; }
     .tooltip .t-unidad { margin-top: 7px; color: var(--texto-2); font-size: 11px; }
-    :is(#ranking, #trayectorias) .tooltip dl { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
-    #ranking .tooltip dl { font-size: 12px; }
+    .ficha-pais .t-contexto { margin: 2px 0 7px; color: var(--texto-2); font-size: 12px; }
+    #dispersion .ficha-pais { position: absolute; margin: 0; opacity: 1; box-shadow: none; }
     #dispersion .ficha-pais dl { grid-template-columns: 1fr; gap: 4px; }
     .ficha-pais dl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: baseline; }
-    #dispersion .ficha-pais { position: absolute; margin: 0; }
     #dispersion.ficha-estrecha .ficha-pais { width: 100%; padding: 8px 10px; font-size: 12px; }
-    @media (max-width: 640px) {
-      :is(#ranking, #trayectorias) .tooltip { width: 100%; }
-    }
 
-    .controles input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--acento); }
-    .nombre-fila { fill: var(--texto); font-size: 13px; }
-    .nombre-fila.argentina { font-weight: 700; }
-    .valor-fila { fill: var(--texto-2); font-size: 12px; font-variant-numeric: tabular-nums; }
-    .nota-grafico { margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
-
-    .resumen { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 6px 0 0; padding: 0; list-style: none; color: var(--texto-2); font-size: 14px; }
-    .resumen li { display: flex; gap: 8px; align-items: baseline; }
-    .resumen i { flex: none; width: 14px; height: 0; border-top: 2px solid; transform: translateY(-4px); }
-    .resumen b { color: var(--texto); font-weight: 600; }
+    .controles[hidden], .lienzo[hidden] { display: none; }
+    .controles-comparacion label { flex: 1 1 180px; }
+    .controles-comparacion select, .controles-comparacion input { min-width: 0; max-width: 100%; }
+    .controles-comparacion input { flex: 1; accent-color: var(--acento); }
+    .controles-comparacion output { min-width: 4ch; font-variant-numeric: tabular-nums; }
+    .controles-comparacion select { flex: 1; }
+    .controles-comparacion button { margin: 0; }
+    .leyenda .casos i { background: var(--acento); }
+    .leyenda .contexto i { background: var(--texto-3); opacity: .65; }
+    .detalle-punto { margin: 6px 0 0; min-height: 3em; color: var(--texto-2); font-size: 14px; }
+    .detalle-punto strong { color: var(--texto); }
+    .estado-grafico { margin: 8px 0; color: var(--texto-2); font-size: 14px; }
     .lista { margin: 0 0 1.1em; padding-left: 1.2em; }
     .lista li { margin-bottom: .3em; }
-    code { font: 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--texto-2); }
-    .leyenda i.trazo { width: 16px; height: 0; border-top: 2px solid; border-radius: 0; }
-    #trayectorias .anio { font-size: 11px; }
-
-    details.tabla { margin-top: 14px; font-size: 14px; }
-    details.tabla summary { cursor: pointer; color: var(--acento); font-weight: 600; }
-    .tabla-scroll { max-height: 420px; margin-top: 10px; overflow: auto; border: 1px solid var(--grilla); border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-    th, td { padding: 6px 10px; border-bottom: 1px solid var(--grilla); text-align: right; white-space: nowrap; }
-    th:first-child, td:first-child { text-align: left; }
-    th { position: sticky; top: 0; background: var(--superficie); color: var(--texto-2); font-weight: 600; cursor: pointer; user-select: none; }
-    th[aria-sort="ascending"]::after { content: " ↑"; }
-    th[aria-sort="descending"]::after { content: " ↓"; }
+    code { overflow-wrap: anywhere; }
 
     footer { margin-top: 64px; padding: 28px 0 60px; border-top: 1px solid var(--grilla); color: var(--texto-3); font-size: 14px; }
     a { color: var(--acento); }
@@ -259,26 +224,25 @@
   <header class="columna">
     <p class="volanta">Salud y desarrollo · Datos del Banco Mundial</p>
     <h1>Vivir más sin ser más rico</h1>
-    <p class="bajada">Los países con mayor PIB por habitante suelen tener una esperanza de vida más alta. Algunos se apartan de ese patrón y viven más o menos de lo que estima el modelo.</p>
+    <p class="bajada">La esperanza de vida suele ser mayor en las economías con más PIB por habitante. Costa Rica y Estados Unidos muestran cuánto puede variar frente a ese patrón.</p>
     <p class="firma"><span class="autores">Por <strong>Javier Peral Belmont</strong> y <strong>Pilar Frutos</strong></span> · Trabajo Práctico Final · Visualización de la Información · ITBA · Noviembre de 2026</p>
   </header>
 
   <article>
     <div class="columna">
-      <p>En 2024, la esperanza de vida al nacer era de 84 años en Japón y de 55 en Nigeria. ¿Cuánto ayuda el PIB por habitante a describir diferencias como esta?</p>
-      <p>El modelo da una referencia para comparar países. La brecha indica cuántos años separan la esperanza de vida observada de la estimada para el PIB por habitante de cada país.</p>
+      <p>En 2024, Costa Rica tenía <strong>2,1 años más de esperanza de vida que Estados Unidos</strong> con el <strong>36 % de su PIB por habitante</strong>. ¿Cuánto nos dice el ingreso sobre la longevidad de un país?</p>
 
       <div class="cifras" id="cifras">
         <div class="cifra"><b data-cifra="duplicar">+3,6 años</b><span>de esperanza de vida estimada por cada duplicación del PIB por habitante en la comparación de 2024</span></div>
         <div class="cifra"><b data-cifra="r2">74,4 %</b><span>de la variación en esperanza de vida que recoge el modelo con PIB per cápita en 195 economías</span></div>
-        <div class="cifra"><b>2,1 años</b><span>más vive Costa Rica que Estados Unidos, con un tercio de su ingreso</span></div>
+        <div class="cifra"><b>−15,4 años</b><span>de brecha entre la esperanza de vida de Nigeria y la que estima el modelo para su PIB por habitante</span></div>
       </div>
     </div>
 
     <figure class="ancho" id="fig-dispersion">
       <div class="tarjeta">
         <h2 class="grafico-titulo">¿Los países con mayor ingreso viven más?</h2>
-        <p class="grafico-sub">El área de cada círculo es proporcional a la población de la economía. La línea marca la esperanza de vida que «corresponde» a cada nivel de ingreso; el color indica cuánto se aleja cada país de ella.</p>
+        <p class="grafico-sub">El área de cada círculo es proporcional a la población de la economía. La línea muestra la esperanza de vida estimada para cada nivel de PIB. El color indica cuántos años separan el valor observado de la estimación.</p>
         <div class="pasos" id="pasos" aria-label="Recorrido guiado por el gráfico"></div>
         <div class="controles controles-dispersion">
           <label><span>Buscar un país</span><input type="search" id="buscar" list="lista-paises" placeholder="Ej.: Argentina" autocomplete="off"></label>
@@ -290,98 +254,76 @@
           </label>
         </div>
         <div class="leyenda" id="leyenda-brecha"></div>
-        <div class="lienzo" id="dispersion"><div class="tooltip ficha-pais" role="status" aria-live="polite" aria-atomic="true"></div></div>
+        <p class="estado-grafico" id="estado-pib" role="status">Cargando el gráfico…</p>
+        <div class="lienzo" id="dispersion" hidden><div class="tooltip ficha-pais" role="status" aria-live="polite" aria-atomic="true"></div></div>
       </div>
-      <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales constantes de 2021), 2024. El eje horizontal es logarítmico: cada marca duplica o multiplica el ingreso. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
+      <figcaption>Esperanza de vida al nacer y PIB per cápita en paridad de poder adquisitivo (dólares internacionales constantes de 2021), 2024. En el eje horizontal logarítmico, pasar de 5 mil a 10 mil ocupa la misma distancia que pasar de 10 mil a 20 mil. Fuente: Banco Mundial, World Development Indicators, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
-      <p>La línea resume el patrón de 2024. El eje horizontal es logarítmico, así que cada duplicación del PIB por habitante ocupa la misma distancia. A lo largo de la línea, esa distancia equivale a unos 3,6 años más de esperanza de vida estimada.</p>
-      <p>El <strong>azul</strong> marca las brechas por encima de lo esperado. El <strong>coral</strong> marca las que quedan por debajo y el <strong>amarillo</strong>, las cercanas a la línea.</p>
+      <p>En el conjunto de 195 economías, duplicar el PIB por habitante equivale a unos 3,6 años más de esperanza de vida estimada a lo largo de la línea. Costa Rica queda <strong>4,5 años por encima</strong> de lo estimado y Estados Unidos, <strong>3 años por debajo</strong>.</p>
+      <p>Nigeria y Nauru también quedan por debajo de la línea, por unos 15 y 10 años, respectivamente. ¿Qué vemos si pasamos del ingreso promedio a una condición más concreta, como el acceso al agua potable?</p>
 
+      <h2>Con acceso parecido al agua, la longevidad puede variar mucho</h2>
+      <p>En 2024, el 82,2 % de la población de Nigeria y el 82,8 % de la de Camboya usaban al menos un servicio básico de agua potable. La esperanza de vida era de <strong>54,6 años en Nigeria y 70,8 en Camboya</strong>.</p>
     </div>
 
-    <!-- Ranking, trayectorias y su texto
-    <div class="columna">
-      <h2>Los que se salen del patrón</h2>
-      <p>Si se mide la distancia de cada país a esa línea aparece un ranking distinto del habitual. No es el de quién vive más, sino el de quién vive más (o menos) de lo que le correspondería por su nivel de ingreso.</p>
-    </div>
-
-    <figure class="ancho" id="fig-ranking">
+    <figure class="ancho" id="fig-agua">
       <div class="tarjeta">
-        <p class="grafico-titulo">¿Cuántos años de más o de menos vive cada país?</p>
-        <p class="grafico-sub">Diferencia, en años, entre la esperanza de vida observada y la que estima el modelo según el PIB por habitante. <span id="resumen-ranking" aria-live="polite"></span></p>
-        <div class="controles">
-          <label>Región del Banco Mundial
-            <select id="region-ranking">
-              <option value="">Todas</option>
-            </select>
-          </label>
-          <label><input type="checkbox" id="chicos"> Incluir países de menos de 1 millón de habitantes</label>
+        <h3 class="grafico-titulo" id="titulo-agua">Acceso básico al agua y esperanza de vida</h3>
+        <p class="grafico-sub">En azul, Nigeria, Camboya y Nauru. Acercá el eje horizontal para ver mejor las economías con acceso del 90 % al 100 %.</p>
+        <div class="controles controles-comparacion" id="controles-agua" hidden>
+          <label>Año <input type="range" min="2000" max="2024" value="2024" id="anio-agua"><output for="anio-agua">2024</output></label>
+          <label>País o territorio <select id="pais-agua"></select></label>
+          <div class="pasos"><button type="button" id="detalle-agua" aria-pressed="false">Ver del 90 % al 100 %</button></div>
         </div>
-        <div class="leyenda" id="leyenda-ranking"></div>
-        <div class="lienzo" id="ranking"><div class="tooltip" role="status"></div></div>
-        <p class="nota-grafico" id="nota-argentina"></p>
-        <details class="tabla">
-          <summary id="resumen-tabla-ranking">Ver las economías del filtro en una tabla</summary>
-          <div class="tabla-scroll"><table id="tabla"></table></div>
-        </details>
+        <div class="leyenda" aria-hidden="true"><span class="casos"><i></i>Casos de la nota</span><span class="contexto"><i></i>Otras economías</span></div>
+        <p class="estado-grafico" id="estado-agua" role="status">Cargando el gráfico…</p>
+        <div class="lienzo" id="agua" hidden></div>
+        <p class="detalle-punto" id="ficha-agua" aria-live="polite" hidden></p>
       </div>
-      <figcaption>Brecha calculada respecto de una regresión de la esperanza de vida sobre el logaritmo del PIB per cápita PPA, 2024 (195 países). Por defecto se excluyen los países de menos de un millón de habitantes, cuyas estimaciones son más inestables. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
+      <figcaption>Una marca por economía con ambos datos en el año seleccionado. El acceso básico se mide como porcentaje de la población que usa una fuente mejorada a no más de 30 minutos de ida y vuelta. Datos de WDI, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
-      <p>Arriba del ranking conviven realidades muy distintas. Entre las economías de ingreso alto, <strong>Kuwait</strong> tiene la mayor brecha positiva: su esperanza de vida supera en 5,2 años lo que estima el modelo. Le sigue <strong>Japón</strong>, con 4,6 años por encima. También se destacan países de ingreso medio como <strong>Sri Lanka</strong>, <strong>Marruecos</strong> y <strong>Jordania</strong>. En América Latina, <strong>Nicaragua</strong>, <strong>Ecuador</strong>, <strong>Costa Rica</strong> y <strong>Chile</strong> superan la línea por cuatro años o más.</p>
-      <p>Entre los países de al menos un millón de habitantes, 11 de las 12 brechas más bajas corresponden a África subsahariana. <strong>Nigeria</strong> queda 15,4 años por debajo de lo que estima el modelo, seguida por <strong>Guinea Ecuatorial</strong> y <strong>Chad</strong>.</p>
-      <p>El único país fuera de África entre esas doce brechas es <strong>Rusia</strong>, y su déficit tiene un sesgo muy marcado. Las rusas viven 2,6 años menos de lo que predice el ingreso del país; los rusos, 7,9 años menos. La diferencia entre mujeres y varones, de 10,6 años, es la más grande del mundo, y se repite en otras ex repúblicas soviéticas como Letonia, Bielorrusia o Ucrania.</p>
-      <p>Pero entre los países ricos, el caso más llamativo tal vez sea otro.</p>
+      <p>Incluso entre las economías con al menos 95 % de acceso, la esperanza de vida de 2024 iba de <strong>62,3 a 86,5 años</strong>. Nauru estaba en el extremo bajo de ese grupo, con un 97,8 % de acceso.</p>
 
-      <h2>¿Cómo se comparan Estados Unidos y Costa Rica?</h2>
-      <p>En 2023, <strong>Estados Unidos</strong> gastó 13.473 dólares internacionales corrientes por habitante en salud y <strong>Costa Rica</strong>, 1.928. En paridad de poder adquisitivo, el gasto por habitante de Estados Unidos fue unas siete veces el de Costa Rica. En 2024, la esperanza de vida en Costa Rica superó en 2,1 años a la de Estados Unidos. Para Estados Unidos, el modelo estima 81,9 años frente a los 78,9 observados.</p>
-      <p>La diferencia no apareció de un día para el otro. Si se sigue el recorrido de cada país desde 1990, se ve que el ingreso estadounidense siguió creciendo mientras su esperanza de vida se estancaba. Otros países, con mucho menos, avanzaron más rápido.</p>
+      <h2>Una exposición similar a partículas finas, veinte años de diferencia</h2>
+      <p>Volvamos a Nigeria. En 2023, su exposición a partículas finas PM2,5 era de <strong>65,7 µg/m³</strong>, cerca de los <strong>69,3 µg/m³</strong> de Bangladés. Nigeria tenía 54,5 años de esperanza de vida y Bangladés, 74,7.</p>
     </div>
 
-    <figure class="ancho" id="fig-trayectorias">
+    <figure class="ancho" id="fig-aire">
       <div class="tarjeta">
-        <h2 class="grafico-titulo">¿Cómo cambiaron el ingreso y la esperanza de vida desde 1990?</h2>
-        <p class="grafico-sub">El círculo hueco marca el primer año disponible y el círculo lleno, el último. Las flechas siguen el orden de los años. Podés seguir un país solo o comparar hasta tres.</p>
-        <div class="pasos" id="atajos" aria-label="Comparaciones sugeridas"></div>
-        <div class="controles" id="selectores"></div>
-        <div class="leyenda" id="leyenda-trayectorias"></div>
-        <p class="ayuda-teclado" id="ayuda-trayectorias">Teclado: Tab para elegir una trayectoria; ← y → para recorrer sus años. Inicio y Fin van a los extremos.</p>
-        <div class="lienzo" id="trayectorias"><div class="tooltip" role="status"></div></div>
-        <ul class="resumen" id="resumen-trayectorias"></ul>
+        <h3 class="grafico-titulo" id="titulo-aire">Exposición a PM2,5 y esperanza de vida</h3>
+        <p class="grafico-sub">En azul, Bangladés y Nigeria. Su cercanía horizontal muestra que la exposición era similar. La distancia vertical muestra la diferencia de longevidad.</p>
+        <div class="controles controles-comparacion" id="controles-aire" hidden>
+          <label>Año <input type="range" min="2000" max="2023" value="2023" id="anio-aire"><output for="anio-aire">2023</output></label>
+          <label>País o territorio <select id="pais-aire"></select></label>
+        </div>
+        <div class="leyenda" aria-hidden="true"><span class="casos"><i></i>Casos de la nota</span><span class="contexto"><i></i>Otras economías</span></div>
+        <p class="estado-grafico" id="estado-aire" role="status">Cargando el gráfico…</p>
+        <div class="lienzo" id="aire" hidden></div>
+        <p class="detalle-punto" id="ficha-aire" aria-live="polite" hidden></p>
       </div>
-      <figcaption>Esperanza de vida al nacer y PIB per cápita PPA (dólares internacionales constantes de 2021), 1990–2024. Eje horizontal logarítmico. En gris, todos los países en 2024 y la línea de esperanza de vida esperada según el ingreso. Fuente: Banco Mundial, WDI, vía Data360.</figcaption>
+      <figcaption>Exposición media anual a PM2,5, ponderada por población, en microgramos por metro cúbico (µg/m³). Cada punto representa una economía con datos de exposición y esperanza de vida. Datos de WDI, vía Data360.</figcaption>
     </figure>
 
     <div class="columna">
-      <p>Desde 1990, Estados Unidos multiplicó por 1,7 su ingreso por habitante y sumó 3,7 años de vida. <strong>Chile</strong> casi triplicó el suyo y ganó 7,7 años; hoy vive más que Estados Unidos con el 40 % de su ingreso. Estados Unidos, Costa Rica y Chile muestran una caída en la esperanza de vida entre 2019 y 2021, durante la pandemia. En los tres, la esperanza de vida de 2024 vuelve a alcanzar o superar el nivel de 2019.</p>
-      <p>El botón «China e India» permite comparar dos ritmos de crecimiento. <strong>China</strong> pasó de 1.700 a casi 24.000 dólares internacionales de 2021 por habitante y ganó diez años de vida. Con los selectores podés explorar otros casos. En 2024, <strong>Polonia</strong> y <strong>Rusia</strong> tenían un ingreso por habitante parecido y la esperanza de vida en Polonia era cinco años mayor. El PIB por habitante de <strong>Gabón</strong> era menor que en 1990.</p>
-      <p><strong>Argentina</strong> recorrió un camino más corto hacia la derecha: su ingreso por habitante creció mucho menos en estos 34 años. Aun así, la esperanza de vida pasó de 71,6 a 77,5 años y hoy está prácticamente donde predice su nivel de ingreso.</p>
+      <h2>Qué queda por explicar</h2>
+      <p>El PIB por habitante describe buena parte de las diferencias de longevidad entre economías. Costa Rica vive más de lo que estima el modelo. Nigeria y Camboya, y Nigeria y Bangladés, muestran que también pueden quedar diferencias grandes de longevidad cuando el acceso al agua o la exposición a partículas finas son parecidos.</p>
+      <p>Las comparaciones son entre economías, con el mismo año dentro de cada comparación. Los gráficos muestran asociaciones. Para saber cuánto contribuyen el agua o el aire a esas diferencias, haría falta tener en cuenta otras condiciones de vida y de salud.</p>
 
-    </div>
-    -->
-
-    <div class="columna">
-      <h2>Lo que dicen (y lo que no) estos datos</h2>
-      <p>El modelo basado en el PIB por habitante capta cerca de tres cuartas partes de la variación observada en la esperanza de vida de las economías de 2024. Las brechas muestran dónde y cuánto se aparta cada país de ese patrón.</p>
-      <p>La atención primaria, la desigualdad y el peso del petróleo en la economía son posibles líneas de investigación para entender algunos casos. Para estimar cuánto aporta cada factor harían falta datos y análisis adicionales.</p>
-
-      <h2 id="metodologia">Cómo lo hicimos</h2>
-      <p>Todos los datos provienen de la <a href="https://data360.worldbank.org/en/api">API de Data360</a> del Banco Mundial, de la base <em>World Development Indicators</em>:</p>
+      <h2 id="metodologia">Datos y método</h2>
+      <p>Los indicadores provienen de <em>World Development Indicators</em>, vía <a href="https://data360.worldbank.org/en/api">Data360 del Banco Mundial</a>. La esperanza de vida al nacer resume los patrones de mortalidad de cada año.</p>
       <ul class="lista">
         <li>Esperanza de vida al nacer, total (<code>WB_WDI_SP_DYN_LE00_IN</code>).</li>
-        <li>PIB per cápita en paridad de poder adquisitivo, dólares internacionales constantes de 2021 (<code>WB_WDI_NY_GDP_PCAP_PP_KD</code>).</li>
-        <li>Población total (<code>WB_WDI_SP_POP_TOTL</code>).</li>
-        <li>Gasto corriente en salud per cápita en PPA, dólares internacionales corrientes (<code>WB_WDI_SH_XPD_CHEX_PP_CD</code>), último año disponible.</li>
-        <li>Mortalidad de menores de 5 años (<code>WB_WDI_SH_DYN_MORT</code>).</li>
+        <li>PIB por habitante en paridad de poder adquisitivo, en dólares internacionales constantes de 2021 (<code>WB_WDI_NY_GDP_PCAP_PP_KD</code>).</li>
+        <li>Población total (<code>WB_WDI_SP_POP_TOTL</code>), para el tamaño de los círculos del primer gráfico.</li>
+        <li>Población que usa al menos un servicio básico de agua potable (<code>WB_WDI_SH_H2O_BASW_ZS</code>).</li>
+        <li>Exposición media anual a PM2,5 (<code>WB_WDI_EN_ATM_PM25_MC_M3</code>).</li>
       </ul>
-      <p>La esperanza de vida «esperada» surge de una regresión lineal de la esperanza de vida sobre el logaritmo del PIB per cápita para los <span data-cifra="n">195</span> países con ambos datos en 2024. La brecha de cada país es la diferencia entre el valor real y el que predice esa recta. La raíz del error cuadrático medio del ajuste es de 3,6 años en esa muestra, una medida del tamaño de las diferencias entre los valores observados y los estimados. Las brechas tienen una correlación superior a 0,99 con las de los modelos alternativos, aunque algunos puestos del ranking cambian. Muchas de estas diferencias ya se observaban en 2019. Las brechas de 2019 y 2024 tienen una correlación de 0,86.</p>
-      <p>Entre las <span data-cifra="n-mortalidad">186</span> economías con datos completos, el modelo basado en el PIB per cápita da cuenta del <span data-cifra="r2-pib-muestra-mortalidad">73,4 %</span> de la variación observada en la esperanza de vida. Al incorporar la mortalidad de menores de 5 años, la proporción sube al <span data-cifra="r2-mortalidad">84,5 %</span>. Parte de esa mejora refleja que la esperanza de vida al nacer ya incorpora la mortalidad en esas edades. La comparación mide el ajuste dentro de la muestra y no permite estimar un efecto causal.</p>
-      <p>Las brechas por sexo se calcularon con el mismo método, usando la esperanza de vida de mujeres y de varones.</p>
-      <p>Hay que tener en cuenta algunas limitaciones. La esperanza de vida anual es una estimación de Naciones Unidas que se interpola a partir de datos quinquenales. Quedan afuera los países sin PIB en PPA reciente, como Cuba, Venezuela, Siria o Yemen. Y una correlación entre ingreso y salud no indica, por sí sola, en qué dirección va la causa.</p>
-      <p>La exploración de la API, la limpieza de los datos y el análisis están en <a href="https://github.com/za0sec/infovis/tree/main/TPFinal/exploracion">notebooks de Python</a> que se pueden abrir en Colab. Los datos procesados se pueden descargar en <a href="datos/paises_2024.csv">CSV</a>.</p>
+      <p>Para el primer gráfico ajustamos una regresión lineal de la esperanza de vida sobre el logaritmo del PIB por habitante. Cada economía tiene el mismo peso en el ajuste. El 74,4 % es la proporción de variación que recoge el modelo dentro del corte de 2024. En cada gráfico se excluyen los agregados regionales y las economías sin datos de alguna de las dos variables del año seleccionado. La cobertura cambia según el indicador y el año.</p>
+      <p>Datos de la nota en CSV. <a href="datos/paises_2024.csv">PIB, población y esperanza de vida, 2024</a> y <a href="datos/agua_aire.csv">agua, aire y esperanza de vida por año</a>.</p>
     </div>
   </article>
 
@@ -394,7 +336,7 @@
 
   <script>
     const fmt = {
-      anios: d3.format(".1f"),
+      anios: v => d3.format(".1f")(v),
       dinero: v => d3.format(",.0f")(v).replace(/,/g, "."),
       pob: v => v >= 1e6 ? d3.format(".1f")(v / 1e6).replace(".", ",") + " millones" : d3.format(",.0f")(v).replace(/,/g, ".") + " hab.",
       signo: v => (v > 0 ? "+" : v < 0 ? "−" : "") + d3.format(".1f")(Math.abs(v)).replace(".", ","),
@@ -404,10 +346,10 @@
 
     const CLASES = [
       { min: 4, nombre: "4 años o más por encima", token: "--mas-fuerte" },
-      { min: 1.5, nombre: "1,5 a 4 por encima", token: "--mas-suave" },
+      { min: 1.5, nombre: "De 1,5 a menos de 4 por encima", token: "--mas-suave" },
       { min: -1.5, nombre: "Cerca de lo esperado", token: "--neutro" },
-      { min: -4, nombre: "1,5 a 4 por debajo", token: "--menos-suave" },
-      { min: -Infinity, nombre: "4 años o más por debajo", token: "--menos-fuerte" },
+      { min: -4, nombre: "Más de 1,5 a 4 por debajo", token: "--menos-suave" },
+      { min: -Infinity, nombre: "Más de 4 años por debajo", token: "--menos-fuerte" },
     ];
     const claseDe = brecha => CLASES.find(c => brecha >= c.min);
     const colorBrecha = d => `var(${claseDe(d.brecha).token})`;
@@ -420,56 +362,6 @@
       return leyenda;
     }
 
-    function tooltip(contenedor, fija = false) {
-      const el = contenedor.querySelector(".tooltip");
-      if (fija) el.classList.add("ficha-ranking");
-      return {
-        mostrar(filas, titulo, subtitulo, x, y, unidad = "") {
-          el.replaceChildren();
-          const t = document.createElement("div"); t.className = "t-pais"; t.textContent = titulo;
-          const s = document.createElement("div"); s.className = "t-region"; s.textContent = subtitulo;
-          const dl = document.createElement("dl");
-          for (const [k, v] of filas) {
-            const dt = document.createElement("dt"); dt.textContent = k;
-            const dd = document.createElement("dd"); dd.textContent = v;
-            dl.append(dt, dd);
-          }
-          el.append(t, s, dl);
-          if (unidad) {
-            const nota = document.createElement("div"); nota.className = "t-unidad"; nota.textContent = unidad;
-            el.append(nota);
-          }
-          if (fija) {
-            const svg = contenedor.querySelector("svg");
-            el.classList.toggle("interior", contenedor.clientWidth >= 900 && svg?.getBoundingClientRect().height > el.offsetHeight + 40);
-            if (el.classList.contains("interior")) {
-              const caja = el.getBoundingClientRect();
-              const tapaDatos = [...svg.querySelectorAll("path, text, circle")].some(marca => {
-                if (marca.getAttribute("opacity") === "0") return false;
-                const r = marca.getBoundingClientRect();
-                if (!(r.right > caja.left && r.left < caja.right && r.bottom > caja.top && r.top < caja.bottom)) return false;
-                if (marca.tagName.toLowerCase() !== "path" || contenedor.id !== "trayectorias") return true;
-                // La caja de una trayectoria abarca también espacio vacío: comprobar el trazo real.
-                const longitud = marca.getTotalLength(), matriz = marca.getScreenCTM();
-                for (let distancia = 0; distancia <= longitud + 4; distancia += 4) {
-                  const punto = marca.getPointAtLength(Math.min(distancia, longitud)).matrixTransform(matriz);
-                  if (punto.x >= caja.left - 2 && punto.x <= caja.right + 2 && punto.y >= caja.top - 2 && punto.y <= caja.bottom + 2) return true;
-                }
-                return false;
-              });
-              if (tapaDatos) el.classList.remove("interior");
-            }
-            return;
-          }
-          const ancho = contenedor.clientWidth, w = el.offsetWidth, h = el.offsetHeight;
-          el.style.left = Math.max(0, Math.min(x + 14, ancho - w)) + "px";
-          el.style.top = Math.max(0, y - h - 12) + "px";
-          el.classList.add("visible");
-        },
-        ocultar() { if (!fija) el.classList.remove("visible"); },
-      };
-    }
-
     function redibujarAlCambiarAncho(el, dibujar) {
       let ancho = el.clientWidth, espera;
       new ResizeObserver(() => {
@@ -479,22 +371,6 @@
         espera = setTimeout(dibujar, 120);
       }).observe(el);
     }
-
-    Promise.all([
-      d3.csv("datos/paises_2024.csv", d3.autoType),
-      d3.json("datos/modelo.json"),
-    ]).then(([paises, modelo]) => {
-      paises.sort((a, b) => b.poblacion - a.poblacion);
-      document.querySelector('[data-cifra="duplicar"]').textContent = "+" + fmt.coma((modelo.b * Math.LN2).toFixed(1)) + " años";
-      document.querySelector('[data-cifra="r2"]').textContent = fmt.porcentaje(modelo.r2);
-      document.querySelector('[data-cifra="r2-mortalidad"]').textContent = fmt.porcentaje(modelo.r2_mortalidad);
-      document.querySelector('[data-cifra="r2-pib-muestra-mortalidad"]').textContent = fmt.porcentaje(modelo.r2_pib_muestra_mortalidad);
-      document.querySelector('[data-cifra="n-mortalidad"]').textContent = modelo.paises_muestra_mortalidad;
-      document.querySelector('[data-cifra="n"]').textContent = modelo.paises;
-      dispersion(paises, modelo);
-      // ranking(paises);
-      // d3.csv("datos/trayectorias.csv", d3.autoType).then(puntos => trayectorias(paises, puntos, modelo));
-    });
 
     function dispersion(paises, modelo) {
       const contenedor = document.getElementById("dispersion");
@@ -552,9 +428,8 @@
       const buscar = document.getElementById("buscar");
       const region = document.getElementById("region");
       // Posición de la etiqueta respecto del círculo para evitar choques en la zona más poblada
-      const DESTACADOS = { USA: "der", CRI: "der", CHL: "arriba", JPN: "der", NGA: "der", RUS: "der", ARG: "der",
-                           ZAF: "der", GNQ: "der", LKA: "izq", IND: "der" };
-      const DESTACADOS_MOVIL = { USA: "abajo", CRI: "izq", NGA: "der" };
+      const DESTACADOS = { USA: "der", CRI: "izq", NGA: "izq", NRU: "der" };
+      const DESTACADOS_MOVIL = { USA: "abajo", CRI: "izq", NGA: "arriba", NRU: "der" };
 
       d3.select("#lista-paises").selectAll("option").data(paises.map(d => d.pais).sort(d3.ascending))
         .join("option").attr("value", d => d);
@@ -574,7 +449,7 @@
         {
           boton: "Por encima",
           color: "--mas-fuerte",
-          activo: d => d.brecha >= 3,
+          activo: d => d.brecha >= 1.5,
           etiquetas: { JOR: "arriba", LKA: "izq", JPN: "der", CRI: "der", CHL: "arriba", BGD: "izq", ECU: "abajo" },
           movil: { JOR: "arriba", LKA: "izq", JPN: "izq", CRI: "izq" },
         },
@@ -588,9 +463,9 @@
         {
           boton: "Por debajo",
           color: "--menos-fuerte",
-          activo: d => d.brecha <= -2.95,
-          etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", TCD: "izq", AGO: "abajo" },
-          movil: { NGA: "der", RUS: "izq", USA: "abajo" },
+          activo: d => d.brecha < -1.5,
+          etiquetas: { NGA: "der", ZAF: "der", GNQ: "der", RUS: "der", USA: "der", NRU: "der", TCD: "izq", AGO: "abajo" },
+          movil: { NGA: "der", RUS: "izq", USA: "abajo", NRU: "der" },
         },
       ];
       let paso = 0;
@@ -648,7 +523,6 @@
         const filtro = region.value;
         const visibles = filtro ? paises.filter(d => d.region === filtro)
           : actual ? paises.filter(actual.activo) : paises;
-        const filtrado = Boolean(filtro) || (paso !== null && paso !== 0);
 
         svg.append("g").selectAll("circle").data(visibles).join("circle")
           .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", radio)
@@ -702,12 +576,6 @@
           .on("pointermove click", ev => {
             if (ev.type === "pointermove" && ev.pointerType === "touch") return;
             const [px, py] = d3.pointer(ev);
-            if (ev.type === "click" && filtrado) {
-              const pulsado = visibles.findLast(d => Math.hypot(x(d.pib) - px, y(d.vida) - py) <= radio(d));
-              if (pulsado) mostrar(pulsado);
-              else irAPaso(0);
-              return;
-            }
             const d = visibles[delaunay.find(px, py)];
             if (!d || Math.hypot(x(d.pib) - px, y(d.vida) - py) > 40) { restaurarFicha(); return; }
             mostrar(d);
@@ -740,390 +608,31 @@
       irAPaso(0);
       redibujarAlCambiarAncho(contenedor, dibujar);
     }
-    function ranking(paises) {
-      const contenedor = document.getElementById("ranking");
-      const tip = tooltip(contenedor, true);
-      const region = document.getElementById("region-ranking");
-      const chicos = document.getElementById("chicos");
-      const resumen = document.getElementById("resumen-ranking");
-      const resumenTabla = document.getElementById("resumen-tabla-ranking");
-      const actualizarTabla = tabla();
-      const N = 12;
-      leyendaBrechas("#leyenda-ranking");
 
-      d3.select(region).selectAll("option.r").data([...new Set(paises.map(d => d.region))].sort(d3.ascending))
-        .join("option").attr("class", "r").attr("value", d => d).text(d => d);
-
-      function filas() {
-        const universo = paises.filter(d => (chicos.checked || d.poblacion >= 1e6) && (!region.value || d.region === region.value))
-          .sort((a, b) => b.brecha - a.brecha);
-        if (universo.length <= N * 2) return { universo, recorte: universo, huecos: [] };
-        // Argentina queda fija en el medio cuando no está entre los extremos, como referencia para el lector
-        const iArg = universo.findIndex(d => d.iso3 === "ARG");
-        const intermedios = universo.length - N * 2;
-        if (iArg >= N && iArg < universo.length - N) {
-          return {
-            universo,
-            recorte: [...universo.slice(0, N), universo[iArg], ...universo.slice(-N)],
-            huecos: [{ en: N, cantidad: iArg - N }, { en: N + 1, cantidad: intermedios - (iArg - N) - 1 }],
-          };
-        }
-        return { universo, recorte: [...universo.slice(0, N), ...universo.slice(-N)], huecos: [{ en: N, cantidad: intermedios }] };
+    async function cargarGraficoPib() {
+      const estado = document.getElementById("estado-pib");
+      const grafico = document.getElementById("dispersion");
+      try {
+        const [paises, modelo] = await Promise.all([
+          d3.csv("datos/paises_2024.csv", d3.autoType),
+          d3.json("datos/modelo.json"),
+        ]);
+        paises.sort((a, b) => b.poblacion - a.poblacion);
+        document.querySelector('[data-cifra="duplicar"]').textContent =
+          "+" + fmt.coma((modelo.b * Math.LN2).toFixed(1)) + " años";
+        document.querySelector('[data-cifra="r2"]').textContent = fmt.porcentaje(modelo.r2);
+        grafico.hidden = false;
+        dispersion(paises, modelo);
+        estado.hidden = true;
+      } catch (error) {
+        grafico.hidden = true;
+        estado.textContent = "No se pudo cargar el gráfico. Podés consultar el CSV en Datos y método.";
+        console.error(error);
       }
-
-      function nota(universo) {
-        const el = document.getElementById("nota-argentina");
-        const i = universo.findIndex(d => d.iso3 === "ARG");
-        if (i < 0) { el.textContent = ""; return; }
-        const arg = universo[i];
-        el.textContent = `Argentina: ${fmt.signo(arg.brecha)} años respecto de lo esperado, puesto ${i + 1} de ${universo.length} con los filtros actuales.`;
-      }
-
-      function dibujar() {
-        const { universo, recorte, huecos } = filas();
-        tip.ocultar();
-        const cantidad = universo.length === 1 ? "1 economía" : `${universo.length} economías`;
-        const alcance = region.value ? ` en ${region.value}` : "";
-        const referencia = recorte.length > N * 2 ? ", con Argentina como referencia" : "";
-        resumen.textContent = universo.length > N * 2
-          ? `De las ${cantidad}${alcance}, se muestran las ${N} brechas más altas y las ${N} más bajas${referencia}.`
-          : `Se muestran ${cantidad}${alcance}.`;
-        resumenTabla.textContent = `Ver ${cantidad} con estos filtros en una tabla`;
-        actualizarTabla(universo);
-        nota(universo);
-        const ancho = contenedor.clientWidth;
-        const angosto = ancho < 560;
-        const fila = 24, hueco = 18;
-        const m = { top: 24, right: angosto ? 36 : 44, bottom: 8, left: angosto ? 100 : 170 };
-        const alto = m.top + m.bottom + recorte.length * fila + huecos.length * hueco;
-        const yDe = i => m.top + i * fila + hueco * huecos.filter(h => i >= h.en).length;
-
-        const x = d3.scaleLinear()
-          .domain([Math.min(-2, d3.min(recorte, d => d.brecha) ?? 0), Math.max(2, d3.max(recorte, d => d.brecha) ?? 0)])
-          .range([m.left + (angosto ? 34 : 44), ancho - m.right]).nice();
-
-        d3.select(contenedor).select("svg").remove();
-        const svg = d3.select(contenedor).insert("svg", ".tooltip")
-          .attr("viewBox", `0 0 ${ancho} ${alto}`)
-          .attr("role", "img")
-          .attr("aria-label", "Ranking de países según cuántos años viven por encima o por debajo de lo esperado por su ingreso");
-
-        svg.append("g").attr("class", "grilla")
-          .selectAll("line").data(x.ticks(angosto ? 3 : 8)).join("line")
-          .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", m.top - 6).attr("y2", alto - m.bottom);
-        svg.append("g").attr("class", "eje")
-          .selectAll("text").data(x.ticks(angosto ? 3 : 8)).join("text")
-          .attr("x", d => x(d)).attr("y", m.top - 10).attr("text-anchor", "middle")
-          .text(d => d === 0 ? "0" : fmt.signo(d).replace(",0", ""));
-        svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.top - 6).attr("y2", alto - m.bottom)
-          .attr("class", "eje-referencia");
-        svg.append("g").selectAll("text").data(huecos.filter(h => h.cantidad > 0)).join("text")
-          .attr("class", "valor-fila").attr("x", x(0) - 8).attr("y", h => yDe(h.en) - 4).attr("text-anchor", "end")
-          .text(h => `… ${h.cantidad} ${h.cantidad === 1 ? "país" : "países"}`);
-
-        const alto_barra = 14;
-        const barra = (d, i) => {
-          const y0 = yDe(i) + (fila - alto_barra) / 2, x0 = x(0), x1 = x(d.brecha), r = Math.min(4, Math.abs(x1 - x0));
-          const s = Math.sign(x1 - x0) || 1;
-          return `M${x0},${y0}H${x1 - s * r}Q${x1},${y0} ${x1},${y0 + r}V${y0 + alto_barra - r}Q${x1},${y0 + alto_barra} ${x1 - s * r},${y0 + alto_barra}H${x0}Z`;
-        };
-        const g = svg.append("g").selectAll("g").data(recorte).join("g");
-        g.append("path").attr("d", barra).attr("fill", colorBrecha);
-        g.append("text").attr("class", d => "nombre-fila" + (d.iso3 === "ARG" ? " argentina" : ""))
-          .attr("x", m.left - 8).attr("y", (d, i) => yDe(i) + fila / 2 + 4).attr("text-anchor", "end")
-          .text(d => d.pais.length > 14 && angosto ? d.pais.slice(0, 13) + "…" : d.pais);
-        g.append("text").attr("class", "valor-fila")
-          .attr("x", d => x(d.brecha) + (d.brecha >= 0 ? 5 : -5)).attr("y", (d, i) => yDe(i) + fila / 2 + 4)
-          .attr("text-anchor", d => d.brecha >= 0 ? "start" : "end")
-          .text(d => fmt.signo(d.brecha));
-        g.append("rect").attr("x", 0).attr("width", ancho).attr("y", (d, i) => yDe(i)).attr("height", fila)
-          .attr("fill", "transparent").attr("tabindex", 0)
-          .on("pointerenter focus click", function (ev, d) {
-            d3.select(this.parentNode).select("path").attr("opacity", .75);
-            const i = recorte.indexOf(d);
-            tip.mostrar([
-              ["Brecha del modelo", fmt.signo(d.brecha) + " años"],
-              ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-              ["Mujeres / varones", d.vida_mujeres ? `${fmt.coma(fmt.anios(d.vida_mujeres))} / ${fmt.coma(fmt.anios(d.vida_varones))} años` : "s/d"],
-            ], d.pais, d.region, x(d.brecha), yDe(i));
-          })
-          .on("pointerleave blur", function () { d3.select(this.parentNode).select("path").attr("opacity", 1); tip.ocultar(); });
-        tip.mostrar([], "Explorá un país", "Pasá por una fila o usá Tab.");
-      }
-
-      region.addEventListener("change", dibujar);
-      chicos.addEventListener("change", dibujar);
-      dibujar();
-      redibujarAlCambiarAncho(contenedor, dibujar);
     }
 
-    function tabla() {
-      const columnas = [
-        { clave: "pais", titulo: "País", texto: d => d.pais },
-        { clave: "vida", titulo: "Esperanza de vida", texto: d => fmt.coma(fmt.anios(d.vida)) },
-        { clave: "esperada", titulo: "Esperada", texto: d => fmt.coma(fmt.anios(d.esperada)) },
-        { clave: "brecha", titulo: "Diferencia", texto: d => fmt.signo(d.brecha) },
-        { clave: "pib", titulo: "PIB por hab. (PPA, $ int. de 2021)", texto: d => fmt.dinero(d.pib) },
-        { clave: "gasto_salud", titulo: "Gasto en salud por hab. (PPA, $ int. corrientes)", texto: d => d.gasto_salud != null ? `${fmt.dinero(d.gasto_salud)} (${d.anio_gasto})` : "s/d" },
-      ];
-      const t = d3.select("#tabla");
-      let paises = [];
-      let orden = { clave: "brecha", asc: false };
-      const encabezado = t.append("thead").append("tr").selectAll("th").data(columnas).join("th")
-        .attr("scope", "col").text(c => c.titulo)
-        .on("click", (ev, c) => { orden = { clave: c.clave, asc: orden.clave === c.clave ? !orden.asc : c.clave === "pais" }; pintar(); });
-      const cuerpo = t.append("tbody");
-      function pintar() {
-        const datos = [...paises].sort((a, b) => (orden.asc ? 1 : -1) * d3.ascending(a[orden.clave] ?? -Infinity, b[orden.clave] ?? -Infinity));
-        encabezado.attr("aria-sort", c => c.clave === orden.clave ? (orden.asc ? "ascending" : "descending") : null);
-        cuerpo.selectAll("tr").data(datos, d => d.iso3).join("tr").order()
-          .selectAll("td").data(d => columnas.map(c => c.texto(d))).join("td").text(v => v);
-      }
-      return universo => {
-        paises = universo;
-        pintar();
-      };
-    }
-    function trayectorias(paises, puntos, modelo) {
-      const contenedor = document.getElementById("trayectorias");
-      const tip = tooltip(contenedor, true);
-      const porPais = d3.group(puntos.filter(d => d.pib > 0 && Number.isFinite(d.vida)), d => d.iso3);
-      for (const serie of porPais.values()) serie.sort((a, b) => a.anio - b.anio);
-      const nombre = new Map(paises.map(d => [d.iso3, d.pais]));
-      const opciones = paises.filter(d => porPais.has(d.iso3)).sort((a, b) => d3.ascending(a.pais, b.pais));
-      const SERIES = ["--serie-1", "--serie-2", "--serie-3"];
-      const elegidos = ["USA", "CRI", "CHL"];
-      const anioConsultado = new Map();
-      const ATAJOS = [
-        { nombre: "EE. UU., Costa Rica y Chile", paises: ["USA", "CRI", "CHL"] },
-        { nombre: "Argentina y vecinos", paises: ["ARG", "URY", "BRA"] },
-        { nombre: "China e India", paises: ["CHN", "IND", ""] },
-        { nombre: "Ver un solo país" },
-      ];
-      const atajos = d3.select("#atajos").selectAll("button").data(ATAJOS).join("button")
-        .attr("type", "button").text(a => a.nombre)
-        .on("click", (ev, a) => {
-          const seleccion = a.paises ?? [elegidos.find(Boolean) ?? "USA", "", ""];
-          seleccion.forEach((iso3, i) => { elegidos[i] = iso3; });
-          selects.property("value", (d, i) => elegidos[i]);
-          dibujar();
-        });
-
-      const selects = d3.select("#selectores").selectAll("label").data(elegidos).join("label")
-        .text((d, i) => `País ${i + 1}`)
-        .append("select")
-        .on("change", function () {
-          elegidos[selects.nodes().indexOf(this)] = this.value;
-          dibujar();
-        });
-      selects.selectAll("option").data(i => [{ iso3: "", pais: "—" }, ...opciones]).join("option")
-        .attr("value", d => d.iso3).text(d => d.pais);
-      selects.property("value", d => d);
-
-      function dibujar() {
-        const paisConFoco = contenedor.contains(document.activeElement) ? document.activeElement.getAttribute("data-pais-teclado") : null;
-        tip.ocultar();
-        const activos = elegidos.map((iso3, i) => ({ iso3, color: `var(${SERIES[i]})` })).filter(d => d.iso3);
-        atajos.attr("aria-pressed", a => a.paises
-          ? a.paises.every((iso3, i) => iso3 === elegidos[i])
-          : activos.length === 1);
-
-        // Resumen de cada recorrido: cuánto cambió el ingreso y cuántos años de vida se ganaron
-        d3.select("#resumen-trayectorias").selectAll("li").data(activos, d => d.iso3).join("li")
-          .call(li => li.selectAll("*").remove())
-          .each(function (a) {
-            const serie = porPais.get(a.iso3);
-            const ini = serie[0], fin = serie[serie.length - 1];
-            const li = d3.select(this);
-            li.append("i").style("border-color", a.color);
-            li.append("span").call(sp => {
-              sp.append("b").text(nombre.get(a.iso3));
-              sp.append("span").text(` ${ini.anio}–${fin.anio}: ingreso ×${fmt.coma((fin.pib / ini.pib).toFixed(1))}, ${fmt.signo(fin.vida - ini.vida)} años de vida`);
-            });
-          });
-        d3.select("#leyenda-trayectorias").selectAll("span").data(activos, d => d.iso3).join("span")
-          .call(s => s.selectAll("*").remove())
-          .call(s => s.append("i").attr("class", "trazo").style("border-color", d => d.color))
-          .call(s => s.append("span").text(d => nombre.get(d.iso3)));
-
-        const ancho = contenedor.clientWidth;
-        const angosto = ancho < 560;
-        const alto = Math.round(angosto ? ancho * 1.05 : Math.max(340, Math.min(520, ancho * 0.55)));
-        const m = { top: 24, right: angosto ? 16 : 24, bottom: 46, left: 60 };
-
-        const recorridos = activos.map(a => ({ ...a, datos: porPais.get(a.iso3) }));
-        const todos = recorridos.flatMap(r => r.datos);
-        // En pantallas angostas el encuadre se ajusta a los países elegidos para que las trayectorias se lean mejor
-        const xDom = d3.extent(angosto && todos.length ? todos.map(d => d.pib) : [...todos.map(d => d.pib), 2000, 60000]);
-        const yDom = d3.extent(angosto && todos.length ? todos.map(d => d.vida) : [...todos.map(d => d.vida), 60, 85]);
-        const x = d3.scaleLog().domain([xDom[0] * .85, xDom[1] * 1.15]).range([m.left, ancho - m.right]);
-        const y = d3.scaleLinear().domain([Math.floor(yDom[0] - 1), Math.ceil(yDom[1] + 1)]).range([alto - m.bottom, m.top]).nice();
-
-        d3.select(contenedor).select("svg").remove();
-        const svg = d3.select(contenedor).insert("svg", ".tooltip")
-          .attr("viewBox", `0 0 ${ancho} ${alto}`)
-          .attr("role", "group")
-          .attr("aria-describedby", "ayuda-trayectorias resumen-trayectorias")
-          .attr("aria-label", "Trayectorias de ingreso y esperanza de vida entre 1990 y 2024 de " + activos.map(a => nombre.get(a.iso3)).join(", "));
-
-        svg.append("g").attr("class", "grilla")
-          .selectAll("line").data(y.ticks(6)).join("line")
-          .attr("x1", m.left).attr("x2", ancho - m.right).attr("y1", d => y(d)).attr("y2", d => y(d));
-        const candidatos = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000].filter(v => v >= x.domain()[0] && v <= x.domain()[1]);
-        svg.append("g").attr("class", "eje").attr("transform", `translate(0,${alto - m.bottom})`)
-          .call(d3.axisBottom(x).tickValues(candidatos).tickFormat(v => (v / 1000) + " mil").tickSizeOuter(0));
-        svg.append("g").attr("class", "eje").attr("transform", `translate(${m.left},0)`)
-          .call(d3.axisLeft(y).ticks(6).tickSizeInner(4).tickSizeOuter(0).tickPadding(6));
-        svg.append("text").attr("class", "titulo-eje").attr("x", (m.left + ancho - m.right) / 2).attr("y", alto - 8).attr("text-anchor", "middle")
-          .text("PIB por habitante (PPA, escala log)");
-        svg.append("text").attr("class", "titulo-eje").attr("text-anchor", "middle")
-          .attr("transform", `translate(14,${(m.top + alto - m.bottom) / 2}) rotate(-90)`)
-          .text("Esperanza de vida (años)");
-
-        const plano = svg.append("g").attr("clip-path", null);
-        const enRango = d => d.pib >= x.domain()[0] && d.pib <= x.domain()[1] && d.vida >= y.domain()[0] && d.vida <= y.domain()[1];
-        plano.append("g").selectAll("circle").data(paises.filter(enRango)).join("circle")
-          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida)).attr("r", 3)
-          .attr("fill", "var(--neutro)").attr("opacity", .45);
-        const curva = d3.range(Math.log(x.domain()[0]), Math.log(x.domain()[1]), 0.05)
-          .map(l => [Math.exp(l), modelo.a + modelo.b * l]).filter(d => d[1] >= y.domain()[0] && d[1] <= y.domain()[1]);
-        plano.append("path").attr("d", d3.line(d => x(d[0]), d => y(d[1]))(curva))
-          .attr("fill", "none").attr("stroke", "var(--recta)").attr("stroke-width", 1.5).attr("opacity", .5);
-
-        const linea = d3.line(d => x(d.pib), d => y(d.vida));
-        const capas = plano.append("g").selectAll("g").data(recorridos).join("g");
-        capas.append("path").attr("class", "recorrido-anual").attr("d", r => linea(r.datos))
-          .attr("fill", "none").attr("stroke", r => r.color).attr("stroke-width", 2)
-          .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
-        capas.selectAll("circle").data(r => r.datos.map(d => ({ ...d, color: r.color }))).join("circle")
-          .attr("cx", d => x(d.pib)).attr("cy", d => y(d.vida))
-          .attr("r", 1.8).attr("fill", d => d.color)
-          .attr("stroke", "var(--superficie)").attr("stroke-width", 0.8);
-
-        // Una flecha por período, situada en el tramo anual con más espacio.
-        capas.each(function (r) {
-          const tramos = d3.pairs(r.datos).map(([desde, hasta]) => {
-            const dx = x(hasta.pib) - x(desde.pib);
-            const dy = y(hasta.vida) - y(desde.vida);
-            return { desde, hasta, dx, dy, largo: Math.hypot(dx, dy) };
-          });
-          for (const [desde, hasta] of [[2019, 2021], [2021, Infinity]]) {
-            const tramo = d3.greatest(tramos.filter(t => t.desde.anio >= desde && t.hasta.anio <= hasta), t => t.largo);
-            if (!tramo || tramo.largo < 8) continue;
-            const { dx, dy } = tramo;
-            const cx = x(tramo.desde.pib) + dx / 2;
-            const cy = y(tramo.desde.vida) + dy / 2;
-            const giro = Math.atan2(dy, dx) * 180 / Math.PI;
-            d3.select(this).append("path").attr("class", "flecha-tiempo")
-              .attr("d", "M5,0L-4,-3.5L-4,3.5Z")
-              .attr("transform", `translate(${cx},${cy}) rotate(${giro})`)
-              .attr("fill", r.color).attr("stroke", "var(--superficie)").attr("stroke-width", 1);
-          }
-        });
-
-        const extremos = recorridos.flatMap(r => {
-          const inicio = r.datos[0], fin = r.datos.at(-1);
-          return inicio === fin
-            ? [{ d: fin, serie: r, final: true }]
-            : [{ d: inicio, serie: r, final: false }, { d: fin, serie: r, final: true }];
-        });
-        plano.append("g").selectAll("circle").data(extremos).join("circle")
-          .attr("class", e => e.final ? "fin-trayectoria" : "inicio-trayectoria")
-          .attr("cx", e => x(e.d.pib)).attr("cy", e => y(e.d.vida)).attr("r", 4.5)
-          .attr("fill", e => e.final ? e.serie.color : "var(--superficie)")
-          .attr("stroke", e => e.final ? "var(--superficie)" : e.serie.color).attr("stroke-width", 1.8);
-
-        const fechas = recorridos.filter(r => r.iso3 === "USA").flatMap(r =>
-          r.datos.slice(1, -1).filter(d => d.anio === 2019 || d.anio === 2021)
-            .map(d => ({ d, intermedia: true }))
-        );
-        const etiquetas = [...extremos.filter(e => e.final), ...extremos.filter(e => !e.final), ...fechas];
-        const ocupadas = extremos.map(({ d }) => ({ x: x(d.pib) - 5, y: y(d.vida) - 5, width: 10, height: 10 }));
-        const choca = caja => ocupadas.some(o => caja.x < o.x + o.width + 2 && o.x < caja.x + caja.width + 2 &&
-          caja.y < o.y + o.height + 2 && o.y < caja.y + caja.height + 2);
-        const capaEtiquetas = plano.append("g");
-        for (const { d, serie, final, intermedia } of etiquetas) {
-          const cx = x(d.pib), cy = y(d.vida);
-          const etiqueta = capaEtiquetas.append("text")
-            .attr("class", final ? "etiqueta anio-fin" : "etiqueta anio")
-            .attr("y", 0)
-            .text(final ? `${nombre.get(serie.iso3)} · ${d.anio}` : d.anio);
-          const medida = etiqueta.node().getBBox();
-          const posiciones = final ? [[9, -9], [-9, -9], [9, 16], [-9, 16]] : [[0, 17], [0, -9], [12, 2], [-12, 2]];
-          let ubicada = false;
-          for (const [dx, dy] of posiciones) {
-            const izquierda = Math.max(2, Math.min(ancho - medida.width - 2,
-              cx + dx - (dx < 0 ? medida.width : dx === 0 ? medida.width / 2 : 0)));
-            const caja = { x: izquierda, y: cy + dy + medida.y, width: medida.width, height: medida.height };
-            if (caja.y < m.top || caja.y + caja.height > alto - m.bottom || choca(caja)) continue;
-            etiqueta.attr("x", izquierda).attr("y", cy + dy);
-            ocupadas.push(caja);
-            ubicada = true;
-            break;
-          }
-          if (!ubicada && intermedia) etiqueta.remove();
-          else if (!ubicada) etiqueta.attr("x", Math.max(2, Math.min(ancho - medida.width - 2, cx - medida.width / 2)))
-            .attr("y", cy + (final ? -9 : 17));
-        }
-
-        const anillo = svg.append("circle").attr("fill", "none").attr("stroke", "var(--texto)").attr("stroke-width", 1.5).attr("r", 6).attr("opacity", 0);
-        const objetivos = recorridos.flatMap(r => r.datos.map(d => ({ ...d, iso3: r.iso3 })));
-        const delaunay = d3.Delaunay.from(objetivos, d => x(d.pib), d => y(d.vida));
-        const mostrar = d => {
-          anillo.attr("cx", x(d.pib)).attr("cy", y(d.vida)).attr("opacity", 1);
-          const inicio = porPais.get(d.iso3)[0];
-          tip.mostrar([
-            ["Esperanza de vida", fmt.coma(fmt.anios(d.vida)) + " años"],
-            ["PIB por habitante", fmt.dinero(d.pib)],
-            [`Cambio desde ${inicio.anio}`, fmt.signo(d.vida - inicio.vida) + " años"],
-          ], nombre.get(d.iso3), `Año ${d.anio}`, x(d.pib), y(d.vida), "PIB en PPA · $ internacionales de 2021");
-        };
-        const indiceConsultado = r => Math.max(0, r.datos.findIndex(d => d.anio === anioConsultado.get(r.iso3)));
-        function actualizarControl(nodo, r, indice, mostrarDato = true) {
-          const d = r.datos[indice];
-          anioConsultado.set(r.iso3, d.anio);
-          d3.select(nodo).attr("aria-valuenow", d.anio)
-            .attr("aria-valuetext", `${d.anio}: esperanza de vida ${fmt.coma(fmt.anios(d.vida))} años; PIB por habitante ${fmt.dinero(d.pib)} dólares internacionales de 2021`);
-          if (mostrarDato) mostrar({ ...d, iso3: r.iso3 });
-        }
-        capas.attr("role", "slider").attr("tabindex", 0)
-          .attr("data-pais-teclado", r => r.iso3)
-          .attr("aria-label", r => `Año de la trayectoria de ${nombre.get(r.iso3)}`)
-          .attr("aria-describedby", "ayuda-trayectorias")
-          .attr("aria-orientation", "horizontal")
-          .attr("aria-valuemin", r => r.datos[0].anio)
-          .attr("aria-valuemax", r => r.datos.at(-1).anio)
-          .each(function (r) { actualizarControl(this, r, indiceConsultado(r), false); })
-          .on("focus", function (ev, r) { actualizarControl(this, r, indiceConsultado(r)); })
-          .on("keydown", function (ev, r) {
-            const i = indiceConsultado(r);
-            const siguiente = { ArrowLeft: i - 1, ArrowDown: i - 1, ArrowRight: i + 1, ArrowUp: i + 1, Home: 0, End: r.datos.length - 1 }[ev.key];
-            if (siguiente === undefined) return;
-            ev.preventDefault();
-            actualizarControl(this, r, Math.max(0, Math.min(r.datos.length - 1, siguiente)));
-          });
-        const restaurarFoco = () => {
-          const nodo = capas.nodes().find(n => n === document.activeElement);
-          if (nodo) { const r = d3.select(nodo).datum(); actualizarControl(nodo, r, indiceConsultado(r)); }
-          else anillo.attr("opacity", 0);
-        };
-        svg.append("rect").attr("width", ancho).attr("height", alto).attr("fill", "transparent")
-          .on("pointermove click", ev => {
-            if (ev.type === "pointermove" && ev.pointerType === "touch") return;
-            if (!objetivos.length) return;
-            const [px, py] = d3.pointer(ev);
-            const d = objetivos[delaunay.find(px, py)];
-            if (Math.hypot(x(d.pib) - px, y(d.vida) - py) > 36) { restaurarFoco(); return; }
-            mostrar(d);
-          })
-          .on("pointerleave", restaurarFoco);
-        tip.mostrar([], activos.length ? "Explorá una trayectoria" : "Elegí un país", activos.length ? "Pasá por un punto o usá Tab y las flechas." : "Usá los selectores para ver su evolución.");
-        if (paisConFoco) capas.nodes().find(n => n.getAttribute("data-pais-teclado") === paisConFoco)?.focus({ preventScroll: true });
-      }
-
-      dibujar();
-      redibujarAlCambiarAncho(contenedor, dibujar);
-    }
+    cargarGraficoPib();
   </script>
+  <script src="comparaciones.js"></script>
 </body>
 </html>
