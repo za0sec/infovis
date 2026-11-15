@@ -42,7 +42,7 @@ jupyter lab TPFinal/exploracion
 2. **Acceso básico al agua y esperanza de vida (2000–2024).** Dispersión por región con año y búsqueda. Incluye la vista de detalle del 90 % al 100 % del notebook.
 3. **Exposición a PM2,5 y esperanza de vida (2000–2023).** Mapa de exposición y dispersión enlazados por país, con selector de año.
 
-La nota incrusta las salidas Altair guardadas en `TPFinal_InfoVis_Grupo_3.ipynb` (celdas 20, 24, 25 y 29). `datos/graficos_grupo3.json` conserva las especificaciones Vega-Lite, los datos y las opciones de esas salidas. La nota usa Vega por CDN y el mapa carga las geometrías de World Atlas que referencia el notebook.
+La nota incrusta las salidas Altair guardadas en `TPFinal_InfoVis_Grupo_3.ipynb` (celdas 20, 24, 25 y 29). `datos/graficos_colab.json` es una copia de las especificaciones Vega-Lite, los datos y las opciones de esas salidas, que también están incrustadas en `index.html`. La nota usa Vega por CDN y el mapa carga las geometrías de World Atlas que referencia el notebook.
 
 Para verla localmente, iniciá un servidor desde la raíz del repositorio.
 
